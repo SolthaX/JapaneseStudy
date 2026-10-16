@@ -76,6 +76,9 @@ export function resolve(spec, en, opts = {}) {
   return { html: html.trim(), text: text.trim(), jp };
 }
 
+/** All words in Japanese, ignoring what's learned (for exports). */
+export const fullJa = (spec) => parse(spec).map((t) => (typeof t === 'string' ? t : t.w)).join('');
+
 /** HTML: Japanese where learned, English otherwise. */
 export const J = (spec, en, opts) => resolve(spec, en, opts).html;
 

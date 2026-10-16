@@ -4,6 +4,16 @@
 // Japanese text uses jp.js specs ([漢字|reading|English]) so only learned kanji show.
 
 const TOKINI_SEARCH = 'https://www.youtube.com/@TokiniAndy/search?query=';
+const PLAYLIST = (id) => `https://www.youtube.com/playlist?list=${id}`;
+
+// ToKini Andy's official playlists (checked on his channel, Oct 2026).
+export const TOKINI = {
+  genki1: PLAYLIST('PLA_RcUI8km1NzJscgRwsMqDh0jnJ-8IuH'), // 【JLPT N5】GENKI Grammar Made Clear 【NO CHAT】
+  genki2: PLAYLIST('PLA_RcUI8km1MyFgg6pYRYNDd1S-LC2ob5'), // 【JLPT N4】GENKI 2 Grammar Made Clear 【NO CHAT】
+  quartet1: PLAYLIST('PLA_RcUI8km1OGb-FERttd9KCObqlYkdx1'), // 【JLPT N3】Intermediate Japanese | Quartet 1
+  quartet2: PLAYLIST('PLA_RcUI8km1MTFeUhywqMyvAJDmP-X5_F'), // 【JLPT N2】Intermediate Japanese | Quartet 2
+  conjugation: PLAYLIST('PLA_RcUI8km1PQTewCBuJiJ4uJcORDJw72'), // Japanese Conjugation Simplified
+};
 
 export const GENKI_STEPS = [
   { id: 'vocab', en: 'Vocabulary', ja: '[単語|たんご|]' },
@@ -30,6 +40,7 @@ const g = (n, ja, en, grammar) => ({ n, ja, en, grammar });
 export const BOOKS = [
   {
     id: 'genki1',
+    playlist: TOKINI.genki1,
     title: 'Genki I',
     ja: 'げんき I',
     color: 'var(--sakura)',
@@ -52,6 +63,7 @@ export const BOOKS = [
   },
   {
     id: 'genki2',
+    playlist: TOKINI.genki2,
     title: 'Genki II',
     ja: 'げんき II',
     color: 'var(--ai)',
@@ -73,6 +85,7 @@ export const BOOKS = [
   },
   {
     id: 'quartet1',
+    playlist: TOKINI.quartet1,
     title: 'Quartet I',
     ja: 'カルテット I',
     color: 'var(--matcha)',
@@ -82,6 +95,7 @@ export const BOOKS = [
   },
   {
     id: 'quartet2',
+    playlist: TOKINI.quartet2,
     title: 'Quartet II',
     ja: 'カルテット II',
     color: 'var(--shu)',

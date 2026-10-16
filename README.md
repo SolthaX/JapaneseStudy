@@ -22,7 +22,8 @@ No build step, no server: plain HTML/CSS/JS modules. Your data stays in the brow
 | Bunpro | No public API: tick your Bunpro reviews by hand (one tap on Today). |
 | Conjugation | Link to the Japan Foundation Sydney conjugation practice. |
 | Natively / WaniKani book clubs | Links. Neither has a public API. |
-| NHK news | NHK doesn't allow browsers to read its feeds directly (no CORS). A GitHub Action (`.github/workflows/news.yml`) fetches the headlines every 3 hours into `data/news.json`. |
+| NHK news | A GitHub Action (`.github/workflows/news.yml`) fetches headlines every 3 hours into `data/news.json`, since browsers can't read NHK's feeds directly. Since NHK's move to NHK ONE, the Easy list needs a login token, so Easy stories come from [NHK Easier](https://nhkeasier.com/)'s RSS. Regular news comes from the NHK ONE RSS. A feed whose newest item is over 7 days old is skipped. |
+| ToKini Andy | Official playlists for Genki I, Genki II, Quartet 1 and Quartet 2 (Books tab and My links), plus a search link per lesson. |
 
 ## Home screen widget (Scriptable)
 
@@ -39,6 +40,14 @@ iOS only lets native apps add widgets, so the widget runs in the free [Scriptabl
 
 WaniKani numbers refresh live on their own (iOS refreshes widgets roughly every 15–30 min). Goals, streak and book progress update each time you tap **Update widget** (also on the Today tab). Tapping the WaniKani tiles opens WaniKani.
 
+## My links
+
+A card on the Today tab with your useful sites as icon tiles, pre-filled with the study links. Tap **Edit** to add, rename, reorder or delete links. For the icon, type an emoji or leave it empty to use the site's own icon. The list syncs between devices.
+
+## Obsidian export
+
+⚙︎ → **Export notes for Obsidian (.zip)** produces a `Benkyō/` folder of Markdown notes with frontmatter: a dashboard, one note per book (chapter steps and grammar as checkboxes), the reading list, monthly study logs with your notes, learned kanji and links. Unzip it into your vault and replace the folder on each export.
+
 ## On your computer (taskbar app)
 
 On a wide screen the app switches to a dashboard layout: sidebar navigation and two columns.
@@ -46,6 +55,8 @@ On a wide screen the app switches to a dashboard layout: sidebar navigation and 
 1. Open the site in **Chrome** or **Edge**.
 2. Click **⬇ Install app** at the top (or the install icon in the address bar, or browser menu → *Install Benkyō*). It opens in its own window.
 3. Right-click its icon in the taskbar → **Pin to taskbar** (on macOS: right-click in the Dock → *Options → Keep in Dock*).
+
+**Zen / Firefox** can't install web apps: pin the tab instead (right-click → *Pin Tab*, or drag it into Zen's *Essentials*). Install from Chrome or Edge as well if you want a taskbar window; sync keeps both identical.
 
 ## Sync phone ↔ computer
 

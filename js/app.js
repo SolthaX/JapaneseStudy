@@ -2,9 +2,10 @@ import { BOOKS, bookById, lessonSpec } from './curriculum.js';
 import { J, jx, T, jt, resolve, setKnown, dateSpec, monthSpec, numKana, DOW, installFurigana } from './jp.js';
 import {
   state, save, onChange, ACTIVITIES, activeGoals, dayLog, setActivity, today, dayKey, parseDay, addDays,
-  dayScore, streak, bestStreak, studyDaysInLast, exportData, importData, persist,
+  dayScore, streak, bestStreak, studyDaysInLast, exportData, importData, persist, DEFAULT_LINKS,
 } from './store.js';
 import { syncNow } from './sync.js';
+import { buildNotes, zip } from './obsidian.js';
 import { syncWaniKani, loadNews, SRS_GROUPS } from './api.js';
 import {
   bookProgress, nextChapter, currentBook, peekChapter, chapterProgress, toggleStep, toggleGrammar,
@@ -232,7 +233,7 @@ function viewToday() {
         </div>`).join('') || '<div class="empty">No goals enabled — pick some in settings ⚙︎</div>'}
     </div>
     </div><div class="col">
-
+    ${linksCard()}
     ${section('ワニカニ', 'WaniKani', state.settings.wkToken ? `<button class="btn small ghost" data-action="sync-wk">${busy.wk ? '…' : '↻ Sync'}</button>` : '')}
     ${wkCard()}
 
@@ -252,6 +253,76 @@ function viewToday() {
     ${jx(pjp) ? '<div class="muted small" style="margin-top:6px">Tap a kanji to see its reading.</div>' : ''}</div>
   </div></div>`;
 }
+
+// ---------- My links ----------
+
+let editingLinks = false;
+const hostOf = (url) => {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return '';
+  }
+};
+
+function linkIcon(l) {
+  if (l.icon) return `<span class="li-emoji">${esc(l.icon)}</span>`;
+  const host = hostOf(l.url);
+  const letter = esc((l.title || host || '?').trim().charAt(0).toUpperCase());
+  return host
+    ? `<img class="li-fav" src="https://icons.duckduckgo.com/ip3/${esc(host)}.ico" alt="" loading="lazy" data-letter="${letter}">`
+    : `<span class="li-letter">${letter}</span>`;
+}
+
+function linksCard() {
+  const links = state.links || [];
+  const head = section('リンク', 'My links', `<button class="btn small ghost" data-action="links-edit">${editingLinks ? 'Done' : 'Edit'}</button>`);
+  if (!editingLinks) {
+    return `${head}<div class="card"><div class="links-grid">${links.map((l) => `
+      <a class="li" href="${esc(l.url)}" target="_blank" rel="noopener" title="${esc(l.url)}">
+        <span class="li-icon">${linkIcon(l)}</span><span class="li-title">${esc(l.title)}</span></a>`).join('')
+      || '<div class="empty">No links yet — tap Edit to add some.</div>'}</div></div>`;
+  }
+  return `${head}<div class="card">
+    <p class="sub" style="margin-top:0">Icon: type an emoji, or leave it empty to use the site's own icon.</p>
+    ${links.map((l, i) => `<div class="link-row">
+      <input class="input li-in-icon" data-link="${l.id}" data-field="icon" value="${esc(l.icon)}" placeholder="🌐" aria-label="Icon">
+      <div class="grow link-fields">
+        <input class="input" data-link="${l.id}" data-field="title" value="${esc(l.title)}" aria-label="Title">
+        <input class="input" data-link="${l.id}" data-field="url" value="${esc(l.url)}" aria-label="Address" inputmode="url">
+      </div>
+      <div class="link-btns">
+        <button class="btn small ghost" data-action="link-move" data-id="${l.id}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="Move up">↑</button>
+        <button class="btn small ghost" data-action="link-move" data-id="${l.id}" data-d="1" ${i === links.length - 1 ? 'disabled' : ''} aria-label="Move down">↓</button>
+        <button class="btn small danger" data-action="link-delete" data-id="${l.id}" aria-label="Delete">✕</button>
+      </div></div>`).join('')}
+    <form class="link-row link-add" data-form="add-link">
+      <input class="input li-in-icon" name="icon" placeholder="🌐" aria-label="Icon">
+      <div class="grow link-fields">
+        <input class="input" name="title" required placeholder="Title">
+        <input class="input" name="url" required placeholder="https://…" inputmode="url">
+      </div>
+      <div class="link-btns"><button class="btn small primary" type="submit">Add</button></div>
+    </form>
+    <button class="btn small ghost" data-action="links-reset" style="margin-top:8px">Restore default links</button>
+  </div>`;
+}
+
+const normalizeUrl = (u) => {
+  const v = u.trim();
+  return /^[a-z][\w+.-]*:/i.test(v) ? v : `https://${v}`;
+};
+
+// Broken site icons fall back to the title's first letter.
+document.addEventListener('error', (e) => {
+  const img = e.target;
+  if (img.classList?.contains('li-fav')) {
+    const span = document.createElement('span');
+    span.className = 'li-letter';
+    span.textContent = img.dataset.letter;
+    img.replaceWith(span);
+  }
+}, true);
 
 function wkCard() {
   if (!state.settings.wkToken) {
@@ -344,7 +415,7 @@ function viewBooks() {
     </div>
     ${section('リンク', 'Links')}
     <div class="link-list">
-      <a class="link-tile" href="https://www.youtube.com/@TokiniAndy/playlists" target="_blank" rel="noopener"><span style="font-size:22px">▶︎</span><div class="grow"><b>ToKini Andy playlists</b><span>Genki & Quartet grammar videos</span></div>↗</a>
+      <a class="link-tile" href="${book.playlist}" target="_blank" rel="noopener"><span style="font-size:22px">▶︎</span><div class="grow"><b>ToKini Andy · ${book.title} playlist</b><span>All grammar videos for this book</span></div>↗</a>
       <a class="link-tile" href="https://sydney.jpf.go.jp/japanese-studies/resources/japanese-conjugation-practice/" target="_blank" rel="noopener"><span style="font-size:22px">🔁</span><div class="grow"><b>Conjugation practice</b><span>The Japan Foundation, Sydney</span></div>↗</a>
     </div>
     </div><div class="col">
@@ -503,7 +574,7 @@ function viewNews() {
       <button class="${newsTab === 'regular' ? 'on' : ''}" data-action="news-tab" data-v="regular">ニュース Regular</button>
     </div>
     <div class="card">
-      <div class="row between"><div><h3>${newsTab === 'easy' ? 'NHK NEWS WEB EASY' : 'NHK ニュース'}</h3>
+      <div class="row between"><div><h3>${newsTab === 'easy' ? 'NHK Easy <span class="muted small">via NHK Easier</span>' : 'NHK ニュース'}</h3>
       <div class="sub">${news?.updated ? `Updated ${new Date(news.updated).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : 'Headlines refresh every few hours'} · ${readCount} read today</div></div></div>
       ${items.length
         ? items.map((n) => `<div class="news-item ${state.newsRead[n.url] ? 'read' : ''}">
@@ -515,8 +586,9 @@ function viewNews() {
     </div><div class="col">
     ${section('リンク', 'Links')}
     <div class="link-list">
-      <a class="link-tile" href="https://www3.nhk.or.jp/news/easy/" target="_blank" rel="noopener" data-action="read-news" data-url="nhk-easy-site"><span style="font-size:22px">🗞️</span><div class="grow"><b>NHK NEWS WEB EASY</b><span>${jx('やさしい[日本語|にほんご|]の')}ニュース · furigana & audio</span></div>↗</a>
-      <a class="link-tile" href="https://www3.nhk.or.jp/news/" target="_blank" rel="noopener" data-action="read-news" data-url="nhk-site"><span style="font-size:22px">📺</span><div class="grow"><b>NHK NEWS WEB</b><span>Regular news</span></div>↗</a>
+      <a class="link-tile" href="https://news.web.nhk/news/easy/" target="_blank" rel="noopener" data-action="read-news" data-url="nhk-easy-site"><span style="font-size:22px">🗞️</span><div class="grow"><b>NHK NEWS WEB EASY</b><span>${jx('やさしい[日本語|にほんご|]の')}ニュース · official site (NHK ONE)</span></div>↗</a>
+      <a class="link-tile" href="https://nhkeasier.com/" target="_blank" rel="noopener" data-action="read-news" data-url="nhk-easier-site"><span style="font-size:22px">🌱</span><div class="grow"><b>NHK Easier</b><span>NHK Easy stories with furigana and a dictionary</span></div>↗</a>
+      <a class="link-tile" href="https://news.web.nhk/newsweb/" target="_blank" rel="noopener" data-action="read-news" data-url="nhk-site"><span style="font-size:22px">📺</span><div class="grow"><b>NHK NEWS WEB</b><span>Regular news</span></div>↗</a>
     </div>
     <p class="sub small center">Tapping a headline logs “Read the news” for today.</p>
     </div></div>`;
@@ -640,6 +712,10 @@ function openSettings() {
         ${[['auto', '', 'Auto (system)'], ['light', '[昼|ひる|]', 'Light'], ['dark', '[夜桜|よざくら|]', 'Night sakura']].map(([v, spec, l]) => `<option value="${v}" ${s.theme === v ? 'selected' : ''}>${spec ? optLabel(spec, l) : l}</option>`).join('')}
       </select></label>
 
+    <h3 style="margin:18px 0 4px">Obsidian second brain</h3>
+    <p class="sub">Downloads a zip of Markdown notes (dashboard, one note per book with chapter and grammar checkboxes, reading list, monthly study logs, learned kanji, links) in a <b>Benkyō</b> folder. Unzip it into your vault and replace the folder each time; the notes carry frontmatter for Dataview and for Claude.</p>
+    <button class="btn" data-action="export-obsidian">Export notes for Obsidian (.zip)</button>
+
     <h3 style="margin:18px 0 4px">Backup バックアップ</h3>
     <p class="sub">Your data lives in this browser only. Export a backup now and then.</p>
     <div class="row" style="flex-wrap:wrap;gap:8px">
@@ -659,9 +735,17 @@ function applyTheme() {
 }
 
 async function exportBackup() {
-  const blob = new Blob([exportData()], { type: 'application/json' });
-  const name = `benkyo-backup-${today()}.json`;
-  const file = new File([blob], name, { type: 'application/json' });
+  await shareOrDownload(new Blob([exportData()], { type: 'application/json' }), `benkyo-backup-${today()}.json`);
+}
+
+async function exportObsidian() {
+  const notes = buildNotes();
+  await shareOrDownload(zip(notes), `Benkyo-Obsidian-${today()}.zip`);
+  toast(`${notes.length} notes exported 📝`);
+}
+
+async function shareOrDownload(blob, name) {
+  const file = new File([blob], name, { type: blob.type });
   if (navigator.canShare?.({ files: [file] })) {
     try {
       await navigator.share({ files: [file], title: name });
@@ -915,6 +999,26 @@ document.addEventListener('click', (e) => {
       return; // let the link open
     }
     case 'export': return exportBackup();
+    case 'export-obsidian': return exportObsidian();
+    case 'links-edit': editingLinks = !editingLinks; return render();
+    case 'link-move': {
+      const i = state.links.findIndex((l) => l.id === el.dataset.id);
+      const j = i + Number(el.dataset.d);
+      if (j < 0 || j >= state.links.length) return;
+      [state.links[i], state.links[j]] = [state.links[j], state.links[i]];
+      save();
+      return;
+    }
+    case 'link-delete':
+      state.links = state.links.filter((l) => l.id !== el.dataset.id);
+      save();
+      return;
+    case 'links-reset':
+      if (confirm('Replace your links with the default list?')) {
+        state.links = DEFAULT_LINKS.map((l) => ({ ...l }));
+        save();
+      }
+      return;
     case 'reset-all':
       if (confirm('Erase all progress on this device? Export a backup first!')) {
         localStorage.clear();
@@ -947,6 +1051,15 @@ document.addEventListener('change', (e) => {
   }
   if (el.dataset.goal) {
     state.settings.goals[el.dataset.goal] = el.checked;
+    save();
+    return;
+  }
+  if (el.dataset.link) {
+    const l = state.links.find((x) => x.id === el.dataset.link);
+    const v = el.value.trim();
+    if (el.dataset.field === 'url') l.url = v ? normalizeUrl(v) : l.url;
+    else if (el.dataset.field === 'title') l.title = v || l.title;
+    else l.icon = v;
     save();
     return;
   }
@@ -1003,6 +1116,18 @@ document.addEventListener('input', (e) => {
 
 document.addEventListener('submit', (e) => {
   const form = e.target;
+  if (form.dataset.form === 'add-link') {
+    e.preventDefault();
+    const f = new FormData(form);
+    state.links.push({
+      id: Math.random().toString(36).slice(2, 10),
+      title: f.get('title').trim(),
+      url: normalizeUrl(f.get('url')),
+      icon: f.get('icon').trim(),
+    });
+    save();
+    return;
+  }
   if (form.dataset.form !== 'add-book') return;
   e.preventDefault();
   const f = new FormData(form);

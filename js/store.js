@@ -12,6 +12,23 @@ export const ACTIVITIES = [
   { id: 'news', en: 'Read the news', ja: 'ニュース', icon: '📰', color: '#c0392b', url: null },
 ];
 
+const YT = (id) => `https://www.youtube.com/playlist?list=${id}`;
+
+// Pre-filled "My links"; an empty icon shows the site's own icon.
+export const DEFAULT_LINKS = [
+  { id: 'wk', title: 'WaniKani', url: 'https://www.wanikani.com/', icon: '' },
+  { id: 'bunpro', title: 'Bunpro', url: 'https://bunpro.jp/dashboard', icon: '' },
+  { id: 'nhk-easy', title: 'NHK Easy', url: 'https://news.web.nhk/news/easy/', icon: '' },
+  { id: 'nhk', title: 'NHK News', url: 'https://news.web.nhk/newsweb/', icon: '📺' },
+  { id: 'ta-g1', title: 'ToKini · Genki I', url: YT('PLA_RcUI8km1NzJscgRwsMqDh0jnJ-8IuH'), icon: '①' },
+  { id: 'ta-g2', title: 'ToKini · Genki II', url: YT('PLA_RcUI8km1MyFgg6pYRYNDd1S-LC2ob5'), icon: '②' },
+  { id: 'ta-q1', title: 'ToKini · Quartet 1', url: YT('PLA_RcUI8km1OGb-FERttd9KCObqlYkdx1'), icon: '③' },
+  { id: 'ta-q2', title: 'ToKini · Quartet 2', url: YT('PLA_RcUI8km1MTFeUhywqMyvAJDmP-X5_F'), icon: '④' },
+  { id: 'conj', title: 'Conjugation drill', url: 'https://sydney.jpf.go.jp/japanese-studies/resources/japanese-conjugation-practice/', icon: '🔁' },
+  { id: 'natively', title: 'Natively', url: 'https://learnnatively.com/', icon: '' },
+  { id: 'wk-clubs', title: 'WK book clubs', url: 'https://community.wanikani.com/search?q=book%20club', icon: '📚' },
+];
+
 const defaults = () => ({
   version: 1,
   settings: {
@@ -27,6 +44,7 @@ const defaults = () => ({
   books: {}, // bookId -> { [chapterNumber]: { steps: {stepId:true}, grammar: {i:true}, done: 'YYYY-MM-DD' } }
   reading: [], // { id, title, url, pages, current, status, started, finished }
   newsRead: {}, // url -> 'YYYY-MM-DD'
+  links: DEFAULT_LINKS.map((l) => ({ ...l })), // { id, title, url, icon }
   badges: {}, // badgeId -> 'YYYY-MM-DD'
   cache: {}, // WaniKani API snapshot
   widgetSyncedAt: null,
@@ -73,6 +91,7 @@ export function units(s = state) {
     for (const [n, v] of Object.entries(chapters)) u[`book:${b}:${n}`] = v;
   }
   for (const r of s.reading || []) u[`read:${r.id}`] = r;
+  if (s.links) u.links = s.links;
   u.settings = Object.fromEntries(SHARED_SETTINGS.map((k) => [k, s.settings?.[k]]));
   return u;
 }
@@ -121,6 +140,8 @@ function setUnit(key, value) {
     if (value && i >= 0) state.reading[i] = value;
     else if (value) state.reading.push(value);
     else if (i >= 0) state.reading.splice(i, 1);
+  } else if (kind === 'links' && value) {
+    state.links = value;
   } else if (kind === 'settings' && value) {
     Object.assign(state.settings, value);
   }
@@ -135,6 +156,7 @@ export function syncPayload() {
     log: state.log,
     books: state.books,
     reading: state.reading,
+    links: state.links,
     newsRead: state.newsRead,
     badges: state.badges,
   };
