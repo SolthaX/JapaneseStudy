@@ -1,0 +1,23 @@
+name: Probe external links (temporary)
+on:
+  push:
+    branches: [claude/nhk-probe]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe easy-news sources
+        run: |
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36"
+          for u in https://nhkeasier.com/feed/ https://nhkeasier.com/ https://news.web.nhk/news/easy/ ; do
+            echo "=== $u"
+            curl -sSL -m 30 -A "$UA" -o body -w "status=%{http_code} final=%{url_effective} type=%{content_type} size=%{size_download}\n" "$u" || echo "curl failed"
+            python3 - <<'PY'
+          import re
+          s = open('body', encoding='utf-8', errors='ignore').read()
+          items = re.findall(r'<item>.*?<title>(.*?)</title>.*?<link>(.*?)</link>.*?(?:<pubDate>(.*?)</pubDate>)?', s, re.S)
+          for t in items[:4]: print('ITEM', t)
+          print('easy hrefs', sorted(set(re.findall(r'/news/easy/[\w/-]*ne20\d+[\w/.-]*', s)))[:5])
+          print('jwt-ish', sorted(set(re.findall(r'https://[\w./-]*(?:token|auth|jwt)[\w./?=-]*', s)))[:5])
+          PY
+          done
