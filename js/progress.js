@@ -145,24 +145,24 @@ const studyDays = () => Object.values(state.log).filter((e) => ACTIVITIES.some((
 const wkLevel = () => state.cache.wk?.level || 0;
 
 export const BADGES = [
-  { id: 'first-day', icon: '🌱', ja: '初日', en: 'First study day', test: () => studyDays() >= 1 },
-  { id: 'streak-7', icon: '🌸', ja: '一週間', en: '7-day streak', test: () => bestStreak() >= 7 },
-  { id: 'streak-30', icon: '🎏', ja: '一ヶ月', en: '30-day streak', test: () => bestStreak() >= 30 },
-  { id: 'streak-100', icon: '🗻', ja: '百日', en: '100-day streak', test: () => bestStreak() >= 100 },
-  { id: 'streak-365', icon: '🎍', ja: '一年', en: '365-day streak', test: () => bestStreak() >= 365 },
-  { id: 'days-50', icon: '🍡', ja: '五十日', en: '50 study days', test: () => studyDays() >= 50 },
-  { id: 'genki1', icon: '📗', ja: 'げんき I 卒業', en: 'Finished Genki I', test: () => finished('genki1') },
-  { id: 'genki2', icon: '📘', ja: 'げんき II 卒業', en: 'Finished Genki II', test: () => finished('genki2') },
+  { id: 'first-day', icon: '🌱', ja: '[初日|しょにち|]', en: 'First study day', test: () => studyDays() >= 1 },
+  { id: 'streak-7', icon: '🌸', ja: '[一週間|いっしゅうかん|]', en: '7-day streak', test: () => bestStreak() >= 7 },
+  { id: 'streak-30', icon: '🎏', ja: '[一ヶ月|いっかげつ|]', en: '30-day streak', test: () => bestStreak() >= 30 },
+  { id: 'streak-100', icon: '🗻', ja: '[百日|ひゃくにち|]', en: '100-day streak', test: () => bestStreak() >= 100 },
+  { id: 'streak-365', icon: '🎍', ja: '[一年|いちねん|]', en: '365-day streak', test: () => bestStreak() >= 365 },
+  { id: 'days-50', icon: '🍡', ja: '[五十日|ごじゅうにち|]', en: '50 study days', test: () => studyDays() >= 50 },
+  { id: 'genki1', icon: '📗', ja: 'げんき I [卒業|そつぎょう|]', en: 'Finished Genki I', test: () => finished('genki1') },
+  { id: 'genki2', icon: '📘', ja: 'げんき II [卒業|そつぎょう|]', en: 'Finished Genki II', test: () => finished('genki2') },
   { id: 'quartet1', icon: '🎻', ja: 'カルテット I', en: 'Finished Quartet I', test: () => finished('quartet1') },
   { id: 'quartet2', icon: '🎼', ja: 'カルテット II', en: 'Finished Quartet II', test: () => finished('quartet2') },
   { id: 'wk-10', icon: '🐊', ja: 'レベル10', en: 'WaniKani level 10', test: () => wkLevel() >= 10 },
   { id: 'wk-20', icon: '🔥', ja: 'レベル20', en: 'WaniKani level 20', test: () => wkLevel() >= 20 },
   { id: 'wk-30', icon: '⚡', ja: 'レベル30', en: 'WaniKani level 30', test: () => wkLevel() >= 30 },
   { id: 'wk-60', icon: '👑', ja: 'レベル60', en: 'WaniKani level 60', test: () => wkLevel() >= 60 },
-  { id: 'conj-20', icon: '🔁', ja: '活用マスター', en: '20 conjugation sessions', test: () => countLog('conj') >= 20 },
-  { id: 'news-10', icon: '📰', ja: '新聞好き', en: 'Read the news 10 days', test: () => countLog('news') >= 10 },
-  { id: 'book-1', icon: '📚', ja: '初めての本', en: 'Finished a Japanese book', test: () => state.reading.some((b) => b.status === 'finished') },
-  { id: 'book-5', icon: '🏯', ja: '本の虫', en: 'Finished 5 books', test: () => state.reading.filter((b) => b.status === 'finished').length >= 5 },
+  { id: 'conj-20', icon: '🔁', ja: '[活用|かつよう|]マスター', en: '20 conjugation sessions', test: () => countLog('conj') >= 20 },
+  { id: 'news-10', icon: '📰', ja: '[新聞好き|しんぶんずき|]', en: 'Read the news 10 days', test: () => countLog('news') >= 10 },
+  { id: 'book-1', icon: '📚', ja: '[初めて|はじめて|]の[本|ほん|]', en: 'Finished a Japanese book', test: () => state.reading.some((b) => b.status === 'finished') },
+  { id: 'book-5', icon: '🏯', ja: '[本|ほん|]の[虫|むし|]', en: 'Finished 5 books', test: () => state.reading.filter((b) => b.status === 'finished').length >= 5 },
 ];
 
 /** Records newly earned badges and returns them. */

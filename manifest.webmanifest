@@ -1,6 +1,6 @@
 {
-  "name": "勉強 Benkyō — Japanese study planner",
-  "short_name": "勉強",
+  "name": "Benkyō — Japanese study planner",
+  "short_name": "Benkyō",
   "description": "Track WaniKani, Bunpro, Genki, Quartet, reading and Japanese news.",
   "start_url": "./",
   "scope": "./",

@@ -404,3 +404,24 @@ main {
 @media (prefers-reduced-motion: reduce) {
   .petal, .bloom, .sheet { animation: none; }
 }
+
+/* ---------- learned kanji & furigana ---------- */
+
+.fg {
+  cursor: pointer;
+  text-decoration: underline dotted color-mix(in srgb, var(--sakura-deep) 45%, transparent);
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 1.5px;
+}
+.ja-hint { color: var(--muted); font-weight: 500; }
+.furi {
+  position: absolute; z-index: 50; pointer-events: none;
+  background: var(--ink); color: var(--bg); font-weight: 700; font-size: 14px;
+  padding: 4px 10px; border-radius: 10px; box-shadow: var(--shadow); white-space: nowrap;
+  animation: furi-in 0.15s ease-out;
+}
+.furi::after {
+  content: ''; position: absolute; left: 50%; bottom: -5px; transform: translateX(-50%);
+  border: 5px solid transparent; border-bottom: 0; border-top-color: var(--ink);
+}
+@keyframes furi-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }

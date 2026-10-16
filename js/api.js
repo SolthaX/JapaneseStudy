@@ -28,15 +28,26 @@ async function wkAll(path) {
 }
 
 const SRS_GROUPS = [
-  { id: 'apprentice', en: 'Apprentice', ja: '見習', stages: [1, 2, 3, 4], color: '#dd0093' },
-  { id: 'guru', en: 'Guru', ja: '達人', stages: [5, 6], color: '#882d9e' },
-  { id: 'master', en: 'Master', ja: '主人', stages: [7], color: '#294ddb' },
-  { id: 'enlightened', en: 'Enlightened', ja: '啓蒙', stages: [8], color: '#0093dd' },
-  { id: 'burned', en: 'Burned', ja: '焼却', stages: [9], color: '#434343' },
+  { id: 'apprentice', en: 'Apprentice', ja: '[見習|みならい|]', stages: [1, 2, 3, 4], color: '#dd0093' },
+  { id: 'guru', en: 'Guru', ja: '[達人|たつじん|]', stages: [5, 6], color: '#882d9e' },
+  { id: 'master', en: 'Master', ja: '[主人|しゅじん|]', stages: [7], color: '#294ddb' },
+  { id: 'enlightened', en: 'Enlightened', ja: '[啓蒙|けいもう|]', stages: [8], color: '#0093dd' },
+  { id: 'burned', en: 'Burned', ja: '[焼却|しょうきゃく|]', stages: [9], color: '#434343' },
 ];
 export { SRS_GROUPS };
 
 const fresh = (snap, ms) => snap && Date.now() - snap.fetchedAt < ms;
+
+/** Maps kanji subject ids to characters, fetching only ids not seen before. */
+async function kanjiCharacters(ids) {
+  const chars = (state.cache.kanjiChars ||= {});
+  const missing = ids.filter((id) => !chars[id]);
+  for (let i = 0; i < missing.length; i += 300) {
+    const subjects = await wkAll(`/subjects?ids=${missing.slice(i, i + 300).join(',')}`);
+    for (const s of subjects) chars[s.id] = s.data.characters;
+  }
+  return ids.map((id) => chars[id] || '').join('');
+}
 
 export async function syncWaniKani({ force = false } = {}) {
   if (!state.settings.wkToken) return null;
@@ -71,6 +82,9 @@ export async function syncWaniKani({ force = false } = {}) {
       const grp = SRS_GROUPS.find((g) => g.stages.includes(a.data.srs_stage));
       if (grp) srs[grp.id]++;
     }
+    // Learned kanji = reached Guru at least once (passed_at is kept even if it slips back).
+    const passed = assignments.filter((a) => a.data.subject_type === 'kanji' && a.data.passed_at).map((a) => a.data.subject_id);
+    state.cache.known = await kanjiCharacters(passed);
     prev.srsAt = Date.now();
   }
 

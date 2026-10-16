@@ -5,10 +5,10 @@ const KEY = 'benkyo-v1';
 
 export const ACTIVITIES = [
   { id: 'wk', en: 'WaniKani reviews', ja: 'ワニカニ', icon: '🐊', color: '#e0457b', url: 'https://www.wanikani.com/' },
-  { id: 'bunpro', en: 'Bunpro reviews', ja: '文プロ', icon: '📘', color: '#f08a24', url: 'https://bunpro.jp/dashboard' },
-  { id: 'textbook', en: 'Textbook study', ja: '教科書', icon: '📖', color: '#3b4f8f', url: null },
-  { id: 'conj', en: 'Conjugation drill', ja: '活用', icon: '🔁', color: '#7a5bb5', url: 'https://sydney.jpf.go.jp/japanese-studies/resources/japanese-conjugation-practice/' },
-  { id: 'reading', en: 'Reading', ja: '読書', icon: '📚', color: '#5c9a5a', url: 'https://learnnatively.com/' },
+  { id: 'bunpro', en: 'Bunpro reviews', ja: '[文プロ|ぶんプロ|]', icon: '📘', color: '#f08a24', url: 'https://bunpro.jp/dashboard' },
+  { id: 'textbook', en: 'Textbook study', ja: '[教科書|きょうかしょ|]', icon: '📖', color: '#3b4f8f', url: null },
+  { id: 'conj', en: 'Conjugation drill', ja: '[活用|かつよう|]', icon: '🔁', color: '#7a5bb5', url: 'https://sydney.jpf.go.jp/japanese-studies/resources/japanese-conjugation-practice/' },
+  { id: 'reading', en: 'Reading', ja: '[読書|どくしょ|]', icon: '📚', color: '#5c9a5a', url: 'https://learnnatively.com/' },
   { id: 'news', en: 'Read the news', ja: 'ニュース', icon: '📰', color: '#c0392b', url: null },
 ];
 
@@ -70,7 +70,7 @@ export function exportData() {
 
 export function importData(json) {
   const data = JSON.parse(json);
-  if (!data || typeof data !== 'object' || !data.settings) throw new Error('Not a 勉強 backup file');
+  if (!data || typeof data !== 'object' || !data.settings) throw new Error('Not a Benkyō backup file');
   for (const k of Object.keys(state)) delete state[k];
   Object.assign(state, merge(defaults(), data));
   save();

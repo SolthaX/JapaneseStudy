@@ -1,4 +1,5 @@
-import { BOOKS, bookById } from './curriculum.js';
+import { BOOKS, bookById, lessonSpec } from './curriculum.js';
+import { J, jx, T, jt, resolve, setKnown, dateSpec, monthSpec, numKana, DOW, installFurigana } from './jp.js';
 import {
   state, save, onChange, ACTIVITIES, activeGoals, dayLog, setActivity, today, dayKey, parseDay, addDays,
   dayScore, streak, bestStreak, studyDaysInLast, exportData, importData,
@@ -13,12 +14,21 @@ import {
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const DOW_JA = '日月火水木金土';
 const fmt1 = (n) => (Math.round(n * 10) / 10).toLocaleString('en');
 
+/** Japanese date if its kanji are learned, else null. */
 function jaDate(d = new Date()) {
-  return `${d.getMonth() + 1}月${d.getDate()}日（${DOW_JA[d.getDay()]}）`;
+  const r = resolve(dateSpec(d), '', { whole: true });
+  return r.jp ? r.html : null;
 }
+const chapterLabel = (n, titleSpec, en) => {
+  const lesson = J(lessonSpec(n, numKana));
+  return titleSpec ? `${lesson} ${J(titleSpec, en)}` : lesson;
+};
+const chapterText = (n, titleSpec, en) => {
+  const lesson = T(lessonSpec(n, numKana));
+  return titleSpec ? `${lesson} ${T(titleSpec, en)}` : lesson;
+};
 const enDate = (d) => d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
 const shortDate = (key) => parseDay(key).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -39,27 +49,36 @@ function toast(msg) {
   toastTimer = setTimeout(() => (el.hidden = true), 2600);
 }
 
-const section = (ja, en, extra = '') => `<h2 class="section-title"><span><span class="ja">${ja}</span><span class="en">${en}</span></span>${extra}</h2>`;
+/** Section heading: Japanese (as far as learned) with the English as a hint. */
+function section(spec, en, extra = '') {
+  const r = resolve(spec, en);
+  return `<h2 class="section-title"><span><span class="ja">${r.html}</span>${r.jp ? `<span class="en">${en}</span>` : ''}</span>${extra}</h2>`;
+}
+/** "English 日本語" label where the Japanese part only appears once learned. */
+const bi = (en, spec) => {
+  const ja = jx(spec);
+  return ja ? `${en} <span class="ja-hint">${ja}</span>` : en;
+};
 
 // ---------- ことわざ ----------
 
 const PROVERBS = [
-  ['継続は力なり', 'けいぞくはちからなり', 'Persistence is power.'],
-  ['塵も積もれば山となる', 'ちりもつもればやまとなる', 'Even dust, piled up, becomes a mountain.'],
-  ['七転び八起き', 'ななころびやおき', 'Fall seven times, get up eight.'],
-  ['千里の道も一歩から', 'せんりのみちもいっぽから', 'A journey of a thousand miles begins with one step.'],
-  ['石の上にも三年', 'いしのうえにもさんねん', 'Three years on a cold stone — perseverance wins.'],
-  ['急がば回れ', 'いそがばまわれ', 'When in a hurry, take the long way round.'],
-  ['習うより慣れろ', 'ならうよりなれろ', 'Get used to it rather than just learning it.'],
-  ['雨垂れ石を穿つ', 'あまだれいしをうがつ', 'Dripping rain wears through stone.'],
-  ['好きこそ物の上手なれ', 'すきこそもののじょうずなれ', 'What you love, you become good at.'],
-  ['為せば成る', 'なせばなる', 'If you act, it can be done.'],
-  ['初心忘るべからず', 'しょしんわするべからず', "Never forget your beginner's spirit."],
-  ['猿も木から落ちる', 'さるもきからおちる', 'Even monkeys fall from trees.'],
-  ['一期一会', 'いちごいちえ', 'One time, one meeting — treasure each moment.'],
-  ['明日は明日の風が吹く', 'あしたはあしたのかぜがふく', "Tomorrow's wind will blow tomorrow."],
-  ['花より団子', 'はなよりだんご', 'Dumplings over flowers.'],
-  ['案ずるより産むが易し', 'あんずるよりうむがやすし', 'Doing is easier than worrying.'],
+  ['[継続|けいぞく|persistence]は[力|ちから|power]なり', 'Persistence is power.'],
+  ['[塵|ちり|dust]も[積もれ|つもれ|piled up]ば[山|やま|mountain]となる', 'Even dust, piled up, becomes a mountain.'],
+  ['[七転び|ななころび|fall seven times][八起き|やおき|rise eight]', 'Fall seven times, get up eight.'],
+  ['[千里|せんり|a thousand miles]の[道|みち|road]も[一歩|いっぽ|one step]から', 'A journey of a thousand miles begins with one step.'],
+  ['[石|いし|stone]の[上|うえ|on]にも[三年|さんねん|three years]', 'Three years on a cold stone — perseverance wins.'],
+  ['[急がば|いそがば|if in a hurry][回れ|まわれ|go around]', 'When in a hurry, take the long way round.'],
+  ['[習う|ならう|learning]より[慣れろ|なれろ|get used to it]', 'Get used to it rather than just learning it.'],
+  ['[雨垂れ|あまだれ|raindrops][石|いし|stone]を[穿つ|うがつ|pierce]', 'Dripping rain wears through stone.'],
+  ['[好き|すき|love]こそ[物|もの|things]の[上手|じょうず|skill]なれ', 'What you love, you become good at.'],
+  ['[為せば|なせば|if you act][成る|なる|it happens]', 'If you act, it can be done.'],
+  ['[初心|しょしん|beginner\'s spirit][忘る|わする|forget]べからず', "Never forget your beginner's spirit."],
+  ['[猿|さる|monkeys]も[木|き|tree]から[落ちる|おちる|fall]', 'Even monkeys fall from trees.'],
+  ['[一期一会|いちごいちえ|once-in-a-lifetime meeting]', 'One time, one meeting — treasure each moment.'],
+  ['[明日|あした|tomorrow]は[明日|あした|tomorrow]の[風|かぜ|wind]が[吹く|ふく|blows]', "Tomorrow's wind will blow tomorrow."],
+  ['[花|はな|flowers]より[団子|だんご|dumplings]', 'Dumplings over flowers.'],
+  ['[案ずる|あんずる|worrying]より[産む|うむ|doing]が[易し|やすし|easy]', 'Doing is easier than worrying.'],
 ];
 
 function proverbOfDay() {
@@ -148,19 +167,19 @@ function goalDetail(a) {
     case 'wk':
       if (!state.settings.wkToken) return 'Add your API token in settings for auto-tracking';
       if (!wk) return 'Syncing…';
-      return `${log.wk && log.wk !== true ? `${log.wk} reviewed today · ` : ''}${wk.reviews} reviews · ${wk.lessons} lessons waiting`;
+      return `${log.wk && log.wk !== true ? `${log.wk} reviewed today · ` : ''}${wk.reviews} reviews · ${wk.lessons} lessons waiting${state.cache.known ? ` · ${state.cache.known.length} kanji learned` : ''}`;
     case 'bunpro':
       return 'Tick when your Bunpro reviews are done';
     case 'textbook': {
       const b = currentBook();
       const ch = nextChapter(b.id);
-      return ch ? `${b.title} · 第${ch.n}課 ${ch.ja}` : `${b.title} finished 🎉`;
+      return ch ? `${b.title} · ${chapterLabel(ch.n, ch.ja, ch.en)}` : `${b.title} finished 🎉`;
     }
     case 'conj':
       return 'Japan Foundation Sydney conjugation practice';
     case 'reading': {
       const r = state.reading.find((x) => x.status === 'reading');
-      return r ? `${r.title}${r.pages ? ` · p.${r.current || 0}/${r.pages}` : ''}` : 'Natively · WaniKani book clubs';
+      return r ? `${esc(r.title)}${r.pages ? ` · p.${r.current || 0}/${r.pages}` : ''}` : 'Natively · WaniKani book clubs';
     }
     case 'news':
       return 'NHK News Web Easy / NHK News';
@@ -183,23 +202,23 @@ function viewToday() {
   const goals = activeGoals();
   const log = dayLog();
   const doneCount = goals.filter((a) => log[a.id]).length;
-  const [pjp, pkana, pen] = proverbOfDay();
+  const [pjp, pen] = proverbOfDay();
 
   return `
     <div class="card hero">
       ${studiedToday ? petals() : ''}
       <div class="hero-top">
         <div><div class="greeting">${hi}</div><div class="greeting-en">${hiEn} · ${enDate(new Date())}</div></div>
-        <div class="streak"><div class="streak-num">${s}</div><div class="streak-label">日連続 · day streak</div></div>
+        <div class="streak"><div class="streak-num">${s}</div><div class="streak-label">${bi('day streak', '[日連続|にちれんぞく|]')}</div></div>
       </div>
       <div class="tree-wrap">${treeSVG(blooms)}</div>
-      <div class="tree-caption"><span>${blooms}/30 days in bloom 開花</span><span>${blooms >= 30 ? '満開！ Full bloom' : `満開まであと${30 - blooms}日`}</span></div>
+      <div class="tree-caption"><span>${blooms}/30 ${bi('days in bloom', '[開花|かいか|]')}</span><span>${blooms >= 30 ? bi('Full bloom!', '[満開|まんかい|]！') : `${30 - blooms} ${bi('days to full bloom', '[満開|まんかい|]まで')}`}</span></div>
     </div>
 
-    ${section('今日の目標', 'Daily goals')}
+    ${section("[今日|きょう|Today's]の[目標|もくひょう|goals]", 'Daily goals')}
     <div class="card">
       <div class="row between" style="margin-bottom:4px">
-        <div><h3>${doneCount === goals.length && goals.length ? 'お疲れ様でした！' : 'がんばって！'}</h3>
+        <div><h3>${doneCount === goals.length && goals.length ? J('お[疲れ様|つかれさま|good work]でした！', 'Great work!') : 'がんばって！'}</h3>
         <div class="sub">${doneCount === goals.length && goals.length ? 'All goals done today. Great work.' : `${goals.length - doneCount} left for today`}</div></div>
         ${ring(doneCount, goals.length)}
       </div>
@@ -207,7 +226,7 @@ function viewToday() {
         <div class="goal ${log[a.id] ? 'done' : ''}">
           <button class="check ${log[a.id] ? 'on' : ''}" data-action="toggle-goal" data-id="${a.id}" aria-label="Mark ${a.en} done">${log[a.id] ? '✓' : ''}</button>
           <span class="goal-icon">${a.icon}</span>
-          <div class="grow"><div class="goal-name">${a.en}<span class="ja">${a.ja}</span></div><div class="sub">${esc(goalDetail(a))}</div></div>
+          <div class="grow"><div class="goal-name">${a.en}<span class="ja">${jx(a.ja)}</span></div><div class="sub">${goalDetail(a)}</div></div>
           ${goalOpen(a)}
         </div>`).join('') || '<div class="empty">No goals enabled — pick some in settings ⚙︎</div>'}
     </div>
@@ -215,10 +234,10 @@ function viewToday() {
     ${section('ワニカニ', 'WaniKani', state.settings.wkToken ? `<button class="btn small ghost" data-action="sync-wk">${busy.wk ? '…' : '↻ Sync'}</button>` : '')}
     ${wkCard()}
 
-    ${section('文プロ', 'Bunpro')}
+    ${section('[文プロ|ぶんプロ|Bunpro]', 'Bunpro')}
     ${bunproCard()}
 
-    ${section('教科書', 'Textbook')}
+    ${section('[教科書|きょうかしょ|Textbook]', 'Textbook')}
     ${textbookCard(currentBook().id, true)}
 
     ${section('ウィジェット', 'Widget')}
@@ -226,8 +245,9 @@ function viewToday() {
       <div class="grow"><h3>Home screen widget</h3><div class="sub">${state.widgetSyncedAt ? `Updated ${new Date(state.widgetSyncedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}${dayKey(new Date(state.widgetSyncedAt)) === today() ? '' : ` · ${shortDate(dayKey(new Date(state.widgetSyncedAt)))}`}` : 'Set it up in ⚙︎ Settings'}</div></div>
       <button class="btn primary small" data-action="update-widget">Update 🌸</button></div></div>
 
-    ${section('今日のことわざ', 'Proverb of the day')}
-    <div class="card proverb"><div class="jp">${pjp}</div><div class="muted small">${pkana}</div><div style="margin-top:6px">${pen}</div></div>
+    ${section("[今日|きょう|Today's]の[ことわざ|ことわざ|proverb]", 'Proverb of the day')}
+    <div class="card proverb">${jx(pjp) ? `<div class="jp">${jx(pjp)}</div>` : ''}<div style="margin-top:6px">${pen}</div>
+    ${jx(pjp) ? '<div class="muted small" style="margin-top:6px">Tap a kanji to see its reading.</div>' : ''}</div>
   `;
 }
 
@@ -249,14 +269,14 @@ function wkCard() {
       <a class="btn small" href="https://www.wanikani.com/" target="_blank" rel="noopener">Open ↗</a>
     </div>
     <div class="stats">
-      <div class="stat"><b>${wk.lessons}</b><span>Lessons 授業</span></div>
-      <div class="stat"><b style="color:var(--sakura-deep)">${wk.reviews}</b><span>Reviews 復習</span></div>
+      <div class="stat"><b>${wk.lessons}</b><span>${bi('Lessons', '[授業|じゅぎょう|]')}</span></div>
+      <div class="stat"><b style="color:var(--sakura-deep)">${wk.reviews}</b><span>${bi('Reviews', '[復習|ふくしゅう|]')}</span></div>
       <div class="stat"><b>${wk.forecast.reduce((a, b) => a + b.n, 0)}</b><span>Next 24h</span></div>
     </div>
     <div class="forecast" aria-label="Review forecast for the next 24 hours">${wk.forecast.map((b) => `<span style="height:${(b.n / max) * 100}%" title="${new Date(b.at).getHours()}:00 — ${b.n}"></span>`).join('')}</div>
     <div class="forecast-axis"><span>now</span><span>+12h</span><span>+24h</span></div>
     ${wk.srs ? `<div class="srs">${SRS_GROUPS.map((g) => `<span style="width:${(wk.srs[g.id] / srsTotal) * 100}%;background:${g.color}"></span>`).join('')}</div>
-    <div class="srs-legend">${SRS_GROUPS.map((g) => `<span><i style="background:${g.color}"></i>${g.ja} ${g.en} ${wk.srs[g.id]}</span>`).join('')}</div>` : ''}
+    <div class="srs-legend">${SRS_GROUPS.map((g) => `<span><i style="background:${g.color}"></i>${bi(g.en, g.ja)} ${wk.srs[g.id]}</span>`).join('')}</div>` : ''}
     ${errors.wk ? `<p class="sub">⚠︎ ${esc(errors.wk)}</p>` : ''}
     <div class="sub small" style="margin-top:8px">Updated ${new Date(wk.fetchedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</div>
   </div>`;
@@ -265,7 +285,7 @@ function wkCard() {
 function bunproCard() {
   const done = dayLog().bunpro;
   return `<div class="card"><div class="row between">
-    <div class="grow"><h3>${done ? 'お疲れ様！' : 'Grammar reviews 文法の復習'}</h3>
+    <div class="grow"><h3>${done ? J('お[疲れ様|つかれさま|good work]！', 'Great work!') : bi('Grammar reviews', '[文法|ぶんぽう|]の[復習|ふくしゅう|]')}</h3>
     <div class="sub">Bunpro has no API — tick it once your reviews are done.</div></div></div>
     <div class="row" style="margin-top:12px">
       <button class="btn ${done ? '' : 'primary'}" data-action="toggle-goal" data-id="bunpro">${done ? '✓ Done today' : 'Mark reviews done'}</button>
@@ -276,13 +296,13 @@ function bunproCard() {
 function paceHTML(bookId) {
   const p = pacing(bookId);
   if (!p) return `<p class="sub">No target date yet. Set one to get a weekly pace.</p>`;
-  if (p.finished) return `<span class="pill ok">✓ Finished 卒業</span>`;
+  if (p.finished) return `<span class="pill ok">✓ ${bi('Finished', '[卒業|そつぎょう|]')}</span>`;
   const d = p.delta;
   const status = Math.abs(d) < 0.25
-    ? `<span class="pill ai">On track 順調</span>`
+    ? `<span class="pill ai">${bi('On track', '[順調|じゅんちょう|]')}</span>`
     : d > 0
-      ? `<span class="pill ok">Ahead by ${fmt1(d)} ch. 先行</span>`
-      : `<span class="pill warn">Behind by ${fmt1(-d)} ch. 遅れ</span>`;
+      ? `<span class="pill ok">${bi(`Ahead by ${fmt1(d)} ch.`, '[先行|せんこう|]')}</span>`
+      : `<span class="pill warn">${bi(`Behind by ${fmt1(-d)} ch.`, '[遅れ|おくれ|]')}</span>`;
   return `<div class="row between" style="flex-wrap:wrap;gap:6px">${status}<span class="sub">Target ${shortDate(p.end)} · ${p.daysLeft} days left</span></div>
     <div class="pace">
       <div class="stat"><b>${fmt1(p.perWeek)}</b><span>chapters / week needed</span></div>
@@ -297,13 +317,13 @@ function textbookCard(bookId, compact) {
   return `<div class="card">
     <div class="row between">
       <div class="grow"><h3>${book.title} <span class="muted small">${book.ja}</span></h3>
-      <div class="sub">${ch ? `Next: 第${ch.n}課 ${ch.ja} — ${ch.en}` : 'All chapters done!'}</div></div>
+      <div class="sub">${ch ? `Next: ${chapterLabel(ch.n, ch.ja, ch.en)}${resolve(ch.ja || ' ', '').jp && ch.ja ? ` — ${ch.en}` : ''}` : 'All chapters done!'}</div></div>
       ${compact ? `<button class="btn small" data-action="tab" data-tab="books">Open</button>` : ''}
     </div>
     <div class="bar" style="margin:12px 0 6px"><span style="width:${prog.ratio * 100}%"></span></div>
     <div class="sub small" style="margin-bottom:10px">${fmt1(prog.done)} / ${prog.total} chapters · ${Math.round(prog.ratio * 100)}%</div>
     ${paceHTML(bookId)}
-    ${compact ? '' : `<label class="field"><span>Target date 目標日</span>
+    ${compact ? '' : `<label class="field"><span>${bi('Target date', '[目標日|もくひょうび|]')}</span>
       <input class="input" type="date" value="${state.settings.targets[bookId]?.end || ''}" data-action="set-target" data-book="${bookId}"></label>
       <small class="muted small">Pace is measured from the day you set the target.</small>`}
   </div>`;
@@ -320,7 +340,7 @@ function viewBooks() {
       ${prog.ratio < 1 ? `<button class="btn small ghost" data-action="book-complete" data-book="${id}">Mark whole book done</button>` : ''}
       ${prog.done > 0 ? `<button class="btn small danger" data-action="book-reset" data-book="${id}">Reset</button>` : ''}
     </div>
-    ${section('課', 'Chapters')}
+    ${section('[課|か|Chapters]', 'Chapters')}
     ${book.chapters.map((c) => chapterHTML(book, c)).join('')}
     ${section('リンク', 'Links')}
     <div class="link-list">
@@ -336,12 +356,12 @@ function chapterHTML(book, c) {
   return `<details class="card chapter ${p >= 1 ? 'complete' : ''}" data-key="${key}" ${openChapters.has(key) ? 'open' : ''}>
     <summary>
       <span class="ch-num">${p >= 1 ? '✓' : c.n}</span>
-      <span class="grow ch-title">第${c.n}課 ${c.ja}<span class="en">${c.en}</span></span>
+      <span class="grow ch-title">${chapterLabel(c.n, c.ja, c.en)}${c.ja && !resolve(c.ja, c.en).jp ? '' : `<span class="en">${c.en}</span>`}</span>
       <span class="sub">${Math.round(p * 100)}%</span>
     </summary>
     <div class="ch-body">
-      <div class="chips">${book.steps.map((s) => `<button class="chip ${ch.steps[s.id] ? 'on' : ''}" data-action="step" data-book="${book.id}" data-n="${c.n}" data-step="${s.id}">${ch.steps[s.id] ? '✓ ' : ''}${s.ja} ${s.en}</button>`).join('')}</div>
-      ${c.grammar.length ? `<ul class="grammar">${c.grammar.map((gp, i) => `<li class="${ch.grammar[i] ? 'on' : ''}"><button class="check ${ch.grammar[i] ? 'on' : ''}" data-action="grammar" data-book="${book.id}" data-n="${c.n}" data-i="${i}" aria-label="Grammar point done">${ch.grammar[i] ? '✓' : ''}</button><span>${gp}</span></li>`).join('')}</ul>` : ''}
+      <div class="chips">${book.steps.map((s) => `<button class="chip ${ch.steps[s.id] ? 'on' : ''}" data-action="step" data-book="${book.id}" data-n="${c.n}" data-step="${s.id}">${ch.steps[s.id] ? '✓ ' : ''}${bi(s.en, s.ja)}</button>`).join('')}</div>
+      ${c.grammar.length ? `<ul class="grammar">${c.grammar.map((gp, i) => `<li class="${ch.grammar[i] ? 'on' : ''}"><button class="check ${ch.grammar[i] ? 'on' : ''}" data-action="grammar" data-book="${book.id}" data-n="${c.n}" data-i="${i}" aria-label="Grammar point done">${ch.grammar[i] ? '✓' : ''}</button><span>${J(gp)}</span></li>`).join('')}</ul>` : ''}
       <div class="row" style="margin-top:12px;flex-wrap:wrap;gap:8px">
         <a class="btn small" href="${book.video(c.n)}" target="_blank" rel="noopener">▶︎ ToKini Andy</a>
         <button class="btn small ghost" data-action="chapter-complete" data-book="${book.id}" data-n="${c.n}" data-v="${p >= 1 ? '0' : '1'}">${p >= 1 ? 'Reset chapter' : 'Mark chapter done'}</button>
@@ -384,31 +404,34 @@ function viewCalendar() {
 
   return `
     <div class="stats" style="margin-top:14px">
-      <div class="stat"><b style="color:var(--sakura-deep)">${streak()}</b><span>Streak 連続</span></div>
-      <div class="stat"><b>${bestStreak()}</b><span>Best 最高</span></div>
-      <div class="stat"><b>${total}</b><span>Study days 合計</span></div>
+      <div class="stat"><b style="color:var(--sakura-deep)">${streak()}</b><span>${bi('Streak', '[連続|れんぞく|]')}</span></div>
+      <div class="stat"><b>${bestStreak()}</b><span>${bi('Best', '[最高|さいこう|]')}</span></div>
+      <div class="stat"><b>${total}</b><span>${bi('Study days', '[合計|ごうけい|]')}</span></div>
     </div>
 
-    ${section('暦', 'Calendar')}
+    ${section('[暦|こよみ|Calendar]', 'Calendar')}
     <div class="card">
       <div class="cal-head">
         <button class="btn small ghost" data-action="cal-prev" aria-label="Previous month">‹</button>
-        <div class="center"><h3>${y}年${m + 1}月</h3><div class="sub">${first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })} · ${monthDays} study days</div></div>
+        <div class="center"><h3>${J(monthSpec(y, m + 1), first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }), { whole: true })}</h3><div class="sub">${resolve(monthSpec(y, m + 1), '', { whole: true }).jp ? `${first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })} · ` : ''}${monthDays} study days</div></div>
         <button class="btn small ghost" data-action="cal-next" aria-label="Next month">›</button>
       </div>
-      <div class="cal-grid">${[...DOW_JA].map((d, i) => `<span class="cal-dow ${i === 0 ? 'sun' : ''}">${d}</span>`).join('')}${cells}</div>
+      <div class="cal-grid">${DOW.map(([k, r, en], i) => `<span class="cal-dow ${i === 0 ? 'sun' : ''}">${J(`[${k}|${r}|${en.slice(0, 2)}]`)}</span>`).join('')}${cells}</div>
       <div class="act-legend">${ACTIVITIES.map((a) => `<span><i style="background:${a.color}"></i>${a.en}</span>`).join('')}</div>
       <p class="sub small" style="margin-bottom:0">Tap a day to log or edit what you studied.</p>
     </div>
 
-    ${section('半年', 'Last 6 months')}
+    ${section('[半年|はんとし|Last 6 months]', 'Last 6 months')}
     <div class="card"><div class="year-strip">${strip}</div>
       <div class="legend">less <i style="background:var(--heat-0)"></i><i style="background:var(--heat-1)"></i><i style="background:var(--heat-2)"></i><i style="background:var(--heat-3)"></i><i style="background:var(--heat-4)"></i> more</div></div>
 
-    ${section('実績', 'Achievements', `<span class="sub">${Object.keys(state.badges).length}/${BADGES.length}</span>`)}
+    ${section('[実績|じっせき|Achievements]', 'Achievements', `<span class="sub">${Object.keys(state.badges).length}/${BADGES.length}</span>`)}
     <div class="badges">${BADGES.map((b) => `<div class="badge ${state.badges[b.id] ? '' : 'locked'}" title="${state.badges[b.id] ? `Earned ${state.badges[b.id]}` : 'Locked'}">
-      <div class="b-icon">${b.icon}</div><div class="b-ja">${b.ja}</div><div class="b-en">${b.en}</div></div>`).join('')}</div>`;
+      <div class="b-icon">${b.icon}</div>${jx(b.ja) ? `<div class="b-ja">${jx(b.ja)}</div>` : ''}<div class="b-en">${b.en}</div></div>`).join('')}</div>`;
 }
+
+const STATUSES = [['reading', '[読書中|どくしょちゅう|]', 'Reading'], ['planned', '[積読|つんどく|]', 'Planned'], ['finished', '[読了|どくりょう|]', 'Finished']];
+const optLabel = (spec, en) => [jt(spec), en].filter(Boolean).join(' ');
 
 function readingItem(b) {
   const pct = b.pages ? Math.min(100, ((b.current || 0) / b.pages) * 100) : 0;
@@ -417,7 +440,7 @@ function readingItem(b) {
       <div class="grow"><div class="title">${b.url ? `<a href="${esc(b.url)}" target="_blank" rel="noopener">${esc(b.title)} ↗</a>` : esc(b.title)}</div>
       <div class="sub">${b.status === 'finished' && b.finished ? `Finished ${shortDate(b.finished)}` : b.started ? `Started ${shortDate(b.started)}` : 'Not started'}</div></div>
       <select class="input" style="width:auto;padding:6px 8px;font-size:13px" data-action="book-status" data-id="${b.id}">
-        ${[['reading', '読書中 Reading'], ['planned', '積読 Planned'], ['finished', '読了 Finished']].map(([v, l]) => `<option value="${v}" ${b.status === v ? 'selected' : ''}>${l}</option>`).join('')}
+        ${STATUSES.map(([v, spec, l]) => `<option value="${v}" ${b.status === v ? 'selected' : ''}>${optLabel(spec, l)}</option>`).join('')}
       </select>
     </div>
     ${b.pages ? `<div class="bar" style="margin:12px 0 6px"><span style="width:${pct}%"></span></div>` : ''}
@@ -433,7 +456,7 @@ function readingItem(b) {
 }
 
 function viewReading() {
-  const groups = [['reading', '読書中', 'Reading now'], ['planned', '積読', 'Up next'], ['finished', '読了', 'Finished']];
+  const groups = [['reading', '[読書中|どくしょちゅう|Reading now]', 'Reading now'], ['planned', '[積読|つんどく|Up next]', 'Up next'], ['finished', '[読了|どくりょう|Finished]', 'Finished']];
   return `
     <div style="height:4px"></div>
     ${groups.map(([st, ja, en]) => {
@@ -443,15 +466,15 @@ function viewReading() {
     ${state.reading.length ? '' : '<div class="empty">No books yet. Add the one you are reading — every page counts toward your streak. 📚</div>'}
     <div style="height:12px"></div>
     <details class="card chapter" ${state.reading.length ? '' : 'open'}>
-      <summary><span class="ch-num">＋</span><span class="grow ch-title">本を追加<span class="en">Add a book</span></span></summary>
+      <summary><span class="ch-num">＋</span><span class="grow ch-title">${J('[本|ほん|book]を[追加|ついか|add]', 'Add a book')}${resolve('[本|ほん|book]を[追加|ついか|add]', 'x').jp ? '<span class="en">Add a book</span>' : ''}</span></summary>
     <form class="ch-body" data-form="add-book">
-      <label class="field"><span>Title 題名</span><input class="input" name="title" required placeholder="e.g. 魔女の宅急便"></label>
+      <label class="field"><span>${bi('Title', '[題名|だいめい|]')}</span><input class="input" name="title" required placeholder="e.g. よつばと！"></label>
       <div class="row" style="gap:10px">
         <label class="field grow"><span>Pages ページ</span><input class="input" name="pages" type="number" inputmode="numeric" min="0" placeholder="240"></label>
-        <label class="field grow"><span>Status</span><select class="input" name="status"><option value="reading">読書中 Reading</option><option value="planned">積読 Planned</option></select></label>
+        <label class="field grow"><span>Status</span><select class="input" name="status">${STATUSES.slice(0, 2).map(([v, spec, l]) => `<option value="${v}">${optLabel(spec, l)}</option>`).join('')}</select></label>
       </div>
       <label class="field"><span>Natively / book club link (optional)</span><input class="input" name="url" type="url" placeholder="https://learnnatively.com/book/…"></label>
-      <button class="btn primary" type="submit">Add book 追加</button>
+      <button class="btn primary" type="submit">${bi('Add book', '[追加|ついか|]')}</button>
     </form></details>
     ${section('リンク', 'Links')}
     <div class="link-list">
@@ -483,7 +506,7 @@ function viewNews() {
     </div>
     ${section('リンク', 'Links')}
     <div class="link-list">
-      <a class="link-tile" href="https://www3.nhk.or.jp/news/easy/" target="_blank" rel="noopener" data-action="read-news" data-url="nhk-easy-site"><span style="font-size:22px">🗞️</span><div class="grow"><b>NHK NEWS WEB EASY</b><span>やさしい日本語のニュース · furigana & audio</span></div>↗</a>
+      <a class="link-tile" href="https://www3.nhk.or.jp/news/easy/" target="_blank" rel="noopener" data-action="read-news" data-url="nhk-easy-site"><span style="font-size:22px">🗞️</span><div class="grow"><b>NHK NEWS WEB EASY</b><span>${jx('やさしい[日本語|にほんご|]の')}ニュース · furigana & audio</span></div>↗</a>
       <a class="link-tile" href="https://www3.nhk.or.jp/news/" target="_blank" rel="noopener" data-action="read-news" data-url="nhk-site"><span style="font-size:22px">📺</span><div class="grow"><b>NHK NEWS WEB</b><span>Regular news</span></div>↗</a>
     </div>
     <p class="sub small center">Tapping a headline logs “Read the news” for today.</p>`;
@@ -496,7 +519,28 @@ function render() {
   const view = $('#view');
   view.innerHTML = VIEWS[tab]();
   document.querySelectorAll('.tabbar button').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
-  $('#today-label').textContent = `${jaDate()} · ${new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}`;
+  const ja = jaDate();
+  $('#today-label').innerHTML = `${ja ? `${ja} · ` : ''}${new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}`;
+  renderChrome();
+}
+
+const TABS = [
+  ['today', '[今日|きょう|]', '🌸', 'Today'],
+  ['calendar', '[暦|こよみ|]', '📅', 'Calendar'],
+  ['books', '[教科書|きょうかしょ|]', '📖', 'Books'],
+  ['reading', '[読書|どくしょ|]', '📚', 'Reading'],
+  ['news', '[新聞|しんぶん|]', '📰', 'News'],
+];
+
+/** Tab bar and brand follow the learned-kanji rule too. */
+function renderChrome() {
+  document.querySelectorAll('.tabbar button').forEach((b) => {
+    const [, spec, icon, en] = TABS.find((t) => t[0] === b.dataset.tab);
+    b.innerHTML = `<span class="tab-ja">${jx(spec) || icon}</span><span class="tab-en">${en}</span>`;
+  });
+  const study = jx('[勉強|べんきょう|]');
+  $('.brand-title').innerHTML = study ? `${study} <small>Benkyō</small>` : 'Benkyō';
+  $('.brand-mark').innerHTML = jx('[桜|さくら|]') || '🌸';
 }
 
 function setTab(t) {
@@ -527,22 +571,23 @@ function openDay(key) {
   const entry = state.log[key] || {};
   const d = parseDay(key);
   openSheet(`
-    <h2>${jaDate(d)}</h2><p class="sub" style="margin-top:-4px">${enDate(d)}</p>
+    <h2>${jaDate(d) || enDate(d)}</h2>${jaDate(d) ? `<p class="sub" style="margin-top:-4px">${enDate(d)}</p>` : ''}
     <div class="card">
       ${ACTIVITIES.map((a) => `<div class="goal ${entry[a.id] ? 'done' : ''}">
         <button class="check ${entry[a.id] ? 'on' : ''}" data-action="day-toggle" data-day="${key}" data-id="${a.id}">${entry[a.id] ? '✓' : ''}</button>
-        <span class="goal-icon">${a.icon}</span><div class="grow"><div class="goal-name">${a.en}<span class="ja">${a.ja}</span></div>
+        <span class="goal-icon">${a.icon}</span><div class="grow"><div class="goal-name">${a.en}<span class="ja">${jx(a.ja)}</span></div>
         ${typeof entry[a.id] === 'number' ? `<div class="sub">${entry[a.id]} ${a.id === 'news' ? 'articles' : a.id === 'reading' ? 'pages' : 'items'}</div>` : ''}</div></div>`).join('')}
     </div>
     <label class="field"><span>Notes メモ</span><textarea class="input" rows="3" data-action="day-note" data-day="${key}" placeholder="What did you learn today?">${esc(entry.note || '')}</textarea></label>
-    <button class="btn primary" style="width:100%" data-action="close-sheet">Done 完了</button>`);
+    <button class="btn primary" style="width:100%" data-action="close-sheet">${bi('Done', '[完了|かんりょう|]')}</button>`);
 }
 
 function openSettings() {
   const s = state.settings;
   openSheet(`
-    <h2>設定 Settings</h2>
-    <label class="field"><span>Your name 名前</span><input class="input" data-setting="name" value="${esc(s.name)}" placeholder="Used in the greeting"></label>
+    <h2>${bi('Settings', '[設定|せってい|]')}</h2>
+    <p class="sub">${state.cache.known ? `${state.cache.known.length} kanji learned on WaniKani — only these appear in Japanese. Tap one to see its reading.` : 'Connect WaniKani: Japanese appears as you learn kanji (Guru).'}</p>
+    <label class="field"><span>${bi('Your name', '[名前|なまえ|]')}</span><input class="input" data-setting="name" value="${esc(s.name)}" placeholder="Used in the greeting"></label>
 
     <h3 style="margin:18px 0 0">ワニカニ WaniKani</h3>
     <label class="field"><span>Personal access token</span>
@@ -564,13 +609,13 @@ function openSettings() {
     </div>
     <p class="sub small">${state.widgetSyncedAt ? `Last update ${new Date(state.widgetSyncedAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : 'Not sent yet.'}</p>
 
-    <h3 style="margin:18px 0 4px">今日の目標 Daily goals</h3>
-    ${ACTIVITIES.map((a) => `<div class="switch-row"><span>${a.icon} ${a.en} <span class="muted small">${a.ja}</span></span>
+    <h3 style="margin:18px 0 4px">${section("[今日|きょう|Today's]の[目標|もくひょう|goals]", 'Daily goals').replace(/<\/?h2[^>]*>/g, '')}</h3>
+    ${ACTIVITIES.map((a) => `<div class="switch-row"><span>${a.icon} ${a.en} <span class="muted small">${jx(a.ja)}</span></span>
       <label class="switch"><input type="checkbox" data-goal="${a.id}" ${s.goals[a.id] ? 'checked' : ''}><span></span></label></div>`).join('')}
 
     <label class="field" style="margin-top:18px"><span>Theme テーマ</span>
       <select class="input" data-setting="theme">
-        ${[['auto', 'Auto (system)'], ['light', '昼 Light'], ['dark', '夜桜 Night sakura']].map(([v, l]) => `<option value="${v}" ${s.theme === v ? 'selected' : ''}>${l}</option>`).join('')}
+        ${[['auto', '', 'Auto (system)'], ['light', '[昼|ひる|]', 'Light'], ['dark', '[夜桜|よざくら|]', 'Night sakura']].map(([v, spec, l]) => `<option value="${v}" ${s.theme === v ? 'selected' : ''}>${spec ? optLabel(spec, l) : l}</option>`).join('')}
       </select></label>
 
     <h3 style="margin:18px 0 4px">Backup バックアップ</h3>
@@ -582,7 +627,7 @@ function openSettings() {
     </div>
 
     <p class="sub small" style="margin-top:18px">Add to iPhone home screen: Safari → Share → “Add to Home Screen”.</p>
-    <button class="btn primary" style="width:100%;margin-top:6px" data-action="close-sheet">Done 完了</button>`);
+    <button class="btn primary" style="width:100%;margin-top:6px" data-action="close-sheet">${bi('Done', '[完了|かんりょう|]')}</button>`);
 }
 
 function applyTheme() {
@@ -625,22 +670,40 @@ function widgetPayload() {
   const p = pacing(b.id);
   let pace = null;
   if (p && !p.finished) {
-    if (Math.abs(p.delta) < 0.25) pace = { label: 'On track 順調', kind: 'on' };
-    else if (p.delta > 0) pace = { label: `+${fmt1(p.delta)} ch. 先行`, kind: 'ahead' };
-    else pace = { label: `−${fmt1(-p.delta)} ch. 遅れ`, kind: 'behind' };
+    if (Math.abs(p.delta) < 0.25) pace = { label: jt('[順調|じゅんちょう|]') || 'On track', kind: 'on' };
+    else if (p.delta > 0) pace = { label: `+${fmt1(p.delta)} ch. ${jt('[先行|せんこう|]')}`.trim(), kind: 'ahead' };
+    else pace = { label: `−${fmt1(-p.delta)} ch. ${jt('[遅れ|おくれ|]')}`.trim(), kind: 'behind' };
   }
   const r = state.reading.find((x) => x.status === 'reading');
-  const [pja, , pen] = proverbOfDay();
+  const [pja, pen] = proverbOfDay();
+  const plain = (en, spec) => [en, jt(spec)].filter(Boolean).join(' ');
+  const SHORT = { wk: 'WK', bunpro: 'Bunpro', textbook: 'Book', conj: 'Conj.', reading: 'Read', news: 'News' };
   return {
     benkyo: 1,
     day: t,
     streak: streak(),
     studiedToday: dayScore(t) > 0,
     heat,
-    goals: activeGoals().map((a) => ({ id: a.id, icon: a.icon, ja: a.ja, done: !!log[a.id] })),
-    book: { title: b.title, next: ch ? `第${ch.n}課 ${ch.ja}` : null, ratio: prog.ratio, done: Math.floor(prog.done), total: prog.total, pace },
+    goals: activeGoals().map((a) => ({ id: a.id, icon: a.icon, label: jt(a.ja) || SHORT[a.id], done: !!log[a.id] })),
+    book: { title: b.title, next: ch ? chapterText(ch.n, ch.ja, ch.en) : null, ratio: prog.ratio, done: Math.floor(prog.done), total: prog.total, pace },
     reading: r ? { title: r.title, current: r.current || 0, pages: r.pages || 0 } : null,
-    proverb: { ja: pja, en: pen },
+    proverb: { ja: jt(pja), en: pen },
+    dateKanji: [...'月日火水木金土'].filter((k) => jt(`[${k}|x|]`)).join(''),
+    labels: {
+      brand: jt('[勉強|べんきょう|]') ? `${jt('[桜|さくら|]') || '🌸'} ${jt('[勉強|べんきょう|]')}` : '🌸 Benkyō',
+      mark: jt('[桜|さくら|]') || '🌸',
+      streak: [jt('[日連続|にちれんぞく|]'), 'streak'].filter(Boolean).join(' · '),
+      streakShort: jt('[日連続|にちれんぞく|]') || 'days',
+      level: 'Level レベル',
+      lessons: plain('Lessons', '[授業|じゅぎょう|]'),
+      reviews: plain('Reviews', '[復習|ふくしゅう|]'),
+      reviewsShort: jt('[復習|ふくしゅう|]') || 'reviews',
+      forecast: plain('Next 24h', '[予報|よほう|]'),
+      goals: T("[今日|きょう|Today's]の[目標|もくひょう|goals]", 'Daily goals'),
+      goalsShort: jt('[目標|もくひょう|]') || 'Goals',
+      allDone: T('お[疲れ様|つかれさま|good work]！', 'Great work!'),
+      bloom: plain('days in bloom', '[開花|かいか|]'),
+    },
     appUrl: location.href.split('#')[0],
     token: state.settings.wkToken || '',
   };
@@ -675,6 +738,7 @@ async function runSync(kind, force) {
   try {
     if (kind === 'wk') {
       await syncWaniKani({ force });
+      setKnown(state.cache.known || '');
       delete errors.wk;
       if (force) toast('WaniKani synced ✓');
     }
@@ -865,7 +929,7 @@ $('#sheet-backdrop').addEventListener('click', closeSheet);
 
 onChange(() => {
   const earned = checkBadges();
-  if (earned.length) toast(`${earned[0].icon} 実績解除！ ${earned[0].en}`);
+  if (earned.length) toast(`${earned[0].icon} ${jt('[実績解除|じっせきかいじょ|]！') || 'Unlocked!'} ${earned[0].en}`);
   if ($('#sheet').hidden) render();
 });
 
@@ -881,6 +945,8 @@ document.addEventListener('visibilitychange', () => {
 
 // ---------- boot ----------
 
+setKnown(state.cache.known || '');
+installFurigana();
 applyTheme();
 render();
 checkBadges();

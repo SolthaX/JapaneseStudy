@@ -2,10 +2,10 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: pink; icon-glyph: leaf;
 
-// 勉強 Benkyō — home screen widget for Scriptable (https://scriptable.app).
+// Benkyō — home screen widget for Scriptable (https://scriptable.app).
 //
 // Setup: in Scriptable create a script named exactly "Benkyo Widget", paste this
-// file, then in the 勉強 app tap ⚙︎ → "Update widget". The app sends your goals,
+// file, then in the Benkyō app tap ⚙︎ → "Update widget". The app sends your goals,
 // streak, textbook and reading progress (plus your WaniKani token, stored in the
 // iOS Keychain). WaniKani numbers are fetched live each time the widget refreshes.
 // Works in small, medium and large sizes — large shows everything.
@@ -32,7 +32,18 @@ const C = {
 // Drawn images can't follow dark mode, so they use tones readable on both backgrounds.
 const HEAT = [['#e0457b', 0.15], ['#f6a9bc', 1], ['#ee7fa0', 1], ['#e0457b', 1], ['#b8285c', 1]];
 
-const DOW = '日月火水木金土';
+// Labels come pre-resolved from the app: Japanese only where the kanji are learned.
+let LBL = {};
+let DATE_KANJI = '';
+const lab = (key, en) => LBL[key] || en;
+const DOW_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MON_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function dateText(d) {
+  const w = '日月火水木金土'[d.getDay()];
+  if ([...`月日${w}`].every((k) => DATE_KANJI.includes(k))) return `${d.getMonth() + 1}月${d.getDate()}日（${w}）`;
+  return `${DOW_EN[d.getDay()]} ${d.getDate()} ${MON_EN[d.getMonth()]}`;
+}
 const pad = (n) => String(n).padStart(2, '0');
 const dayKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const daysBetween = (a, b) => {
@@ -257,8 +268,8 @@ function header(w, data, big) {
   const row = hstack(w);
   const left = vstack(row);
   const title = hstack(left, 4);
-  txt(title, '桜 勉強', big ? 17 : 15, C.pink, 'bold');
-  txt(left, `${now.getMonth() + 1}月${now.getDate()}日（${DOW[now.getDay()]}）`, 11, C.muted, 'medium');
+  txt(title, lab('brand', '🌸 Benkyō'), big ? 17 : 15, C.pink, 'bold');
+  txt(left, dateText(now), 11, C.muted, 'medium');
   row.addSpacer();
   const right = vstack(row);
   const sRow = hstack(right, 3);
@@ -266,17 +277,17 @@ function header(w, data, big) {
   txt(sRow, '🔥', big ? 18 : 15);
   txt(sRow, data ? data.streak : '–', big ? 26 : 20, C.pink, 'bold');
   if (!big) {
-    txt(sRow, '日連続', 10, C.muted, 'medium');
+    txt(sRow, lab('streakShort', 'days'), 10, C.muted, 'medium');
     return;
   }
-  const lab = hstack(right);
-  lab.addSpacer();
-  txt(lab, '日連続 · streak', 10, C.muted, 'medium');
+  const lab2 = hstack(right);
+  lab2.addSpacer();
+  txt(lab2, lab('streak', 'day streak'), 10, C.muted, 'medium');
 }
 
 function wkSection(w, wkData, width, height) {
   if (!wkData) {
-    txt(w, 'WaniKani: add your token in 勉強, then tap “Update widget”.', 11, C.muted);
+    txt(w, 'WaniKani: add your token in Benkyō, then tap “Update widget”.', 11, C.muted);
     return;
   }
   if (wkData.error) {
@@ -286,15 +297,15 @@ function wkSection(w, wkData, width, height) {
   const gap = 8;
   const tw = (width - gap * 2) / 3;
   const row = hstack(w, gap);
-  tile(row, wkData.level, 'Level レベル', C.ai, tw, 'https://www.wanikani.com/dashboard', height);
-  tile(row, wkData.lessons, 'Lessons 授業', C.ink, tw, 'https://www.wanikani.com/subject-lessons/start', height);
-  tile(row, wkData.reviews, 'Reviews 復習', wkData.reviews ? C.pink : C.ok, tw, 'https://www.wanikani.com/subjects/review', height);
+  tile(row, wkData.level, lab('level', 'Level'), C.ai, tw, 'https://www.wanikani.com/dashboard', height);
+  tile(row, wkData.lessons, lab('lessons', 'Lessons'), C.ink, tw, 'https://www.wanikani.com/subject-lessons/start', height);
+  tile(row, wkData.reviews, lab('reviews', 'Reviews'), wkData.reviews ? C.pink : C.ok, tw, 'https://www.wanikani.com/subjects/review', height);
 }
 
 function forecastSection(w, wkData, width) {
   if (!wkData || wkData.error) return;
   const head = hstack(w);
-  txt(head, 'Next 24h 予報', 10, C.muted, 'medium');
+  txt(head, lab('forecast', 'Next 24h'), 10, C.muted, 'medium');
   head.addSpacer();
   const total = wkData.forecast.reduce((a, b) => a + b, 0);
   txt(head, `${total} reviews · ${wkData.doneToday} done today${wkData.stale ? ' · offline' : ''}`, 10, C.muted, 'medium');
@@ -306,9 +317,9 @@ function forecastSection(w, wkData, width) {
 function goalsSection(w, data, compact) {
   const done = data.goals.filter((g) => g.done).length;
   const head = hstack(w);
-  txt(head, '今日の目標 Daily goals', 11, C.ink, 'bold');
+  txt(head, lab('goals', 'Daily goals'), 11, C.ink, 'bold');
   head.addSpacer();
-  txt(head, done === data.goals.length && done ? 'お疲れ様！' : `${done}/${data.goals.length}`, 11, C.pink, 'bold');
+  txt(head, done === data.goals.length && done ? lab('allDone', 'Great work!') : `${done}/${data.goals.length}`, 11, C.pink, 'bold');
   w.addSpacer(compact ? 4 : 5);
   const row = hstack(w);
   data.goals.forEach((g, i) => {
@@ -326,7 +337,7 @@ function goalsSection(w, data, compact) {
     if (compact) return;
     const bot = hstack(cell);
     bot.addSpacer();
-    txt(bot, g.done ? '✓' : g.ja, g.done ? 11 : 8, g.done ? Color.white() : C.muted, 'bold');
+    txt(bot, g.done ? '✓' : g.label, g.done ? 11 : 8, g.done ? Color.white() : C.muted, 'bold');
     bot.addSpacer();
   });
 }
@@ -354,7 +365,7 @@ function bookSection(w, data, width) {
 function heatSection(w, data, width) {
   const studied = data.heat.filter((s) => s > 0).length;
   const head = hstack(w);
-  txt(head, `🌸 ${studied}/${data.heat.length} days in bloom 開花`, 10, C.muted, 'medium');
+  txt(head, `🌸 ${studied}/${data.heat.length} ${lab('bloom', 'days in bloom')}`, 10, C.muted, 'medium');
   head.addSpacer();
   txt(head, data.stale ? `synced ${data.day.slice(5).replace('-', '/')}` : 'today', 10, C.muted, 'medium');
   w.addSpacer(4);
@@ -364,7 +375,7 @@ function heatSection(w, data, width) {
 
 function emptyState(w) {
   w.addSpacer();
-  txt(w, 'Open 勉強 → ⚙︎ → “Update widget”', 12, C.ink, 'bold');
+  txt(w, 'Open Benkyō → ⚙︎ → “Update widget”', 12, C.ink, 'bold');
   txt(w, 'to send your goals and progress here.', 11, C.muted);
   w.addSpacer();
 }
@@ -372,6 +383,8 @@ function emptyState(w) {
 async function build(family) {
   const synced = ingestPayload();
   const snap = readJSON(SNAP);
+  LBL = (snap && snap.labels) || {};
+  DATE_KANJI = (snap && snap.dateKanji) || '';
   const wkData = await loadWaniKani();
   const data = project(snap, wkData);
 
@@ -390,7 +403,7 @@ async function build(family) {
 
   if (family === 'small') {
     const top = hstack(w, 3);
-    txt(top, '桜', 15, C.pink, 'bold');
+    txt(top, lab('mark', '🌸'), 15, C.pink, 'bold');
     top.addSpacer();
     txt(top, '🔥', 13);
     txt(top, data ? data.streak : '–', 18, C.pink, 'bold');
@@ -399,13 +412,13 @@ async function build(family) {
       const r = hstack(w);
       txt(r, wkData.reviews, 30, wkData.reviews ? C.pink : C.ok, 'bold');
       r.addSpacer(4);
-      txt(r, '復習', 12, C.muted, 'bold');
+      txt(r, lab('reviewsShort', 'reviews'), 12, C.muted, 'bold');
       txt(w, `${wkData.lessons} lessons · Lv ${wkData.level}`, 11, C.muted, 'medium');
     }
     if (data) {
       w.addSpacer(4);
       const done = data.goals.filter((g) => g.done).length;
-      txt(w, `目標 ${done}/${data.goals.length} ${data.goals.map((g) => (g.done ? '●' : '○')).join('')}`, 11, C.ink, 'medium');
+      txt(w, `${lab('goalsShort', 'Goals')} ${done}/${data.goals.length} ${data.goals.map((g) => (g.done ? '●' : '○')).join('')}`, 11, C.ink, 'medium');
     }
     return { w, synced };
   }
@@ -452,7 +465,7 @@ if (config.runsInWidget) {
 } else {
   if (synced) {
     const n = new Notification();
-    n.title = '勉強 widget updated ✓';
+    n.title = 'Benkyō widget updated ✓';
     n.body = 'Your goals and progress are on the home screen.';
     n.schedule();
   }
