@@ -1,0 +1,49 @@
+name: Probe external links (temporary)
+on:
+  push:
+    branches: [claude/nhk-probe]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe URLs
+        run: |
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36"
+          for u in \
+            https://www3.nhk.or.jp/news/easy/news-list.json \
+            https://www3.nhk.or.jp/news/easy/top-list.json \
+            https://news.web.nhk/news/easy/news-list.json \
+            https://news.web.nhk/news/easy/top-list.json \
+            https://news.web.nhk/news/easy/ \
+            https://www3.nhk.or.jp/news/easy/ \
+            https://www3.nhk.or.jp/rss/news/cat0.xml \
+            https://news.web.nhk/n-data/conf/na/rss/cat0.xml \
+            https://www.nhk.or.jp/rss/news/cat0.xml \
+            https://news.web.nhk/newsweb/ \
+            https://www3.nhk.or.jp/news/ \
+            https://www.wanikani.com/ https://bunpro.jp/dashboard https://learnnatively.com/ \
+            https://sydney.jpf.go.jp/japanese-studies/resources/japanese-conjugation-practice/ \
+            https://community.wanikani.com/search?q=book%20club ; do
+            echo "=== $u"
+            curl -sSL -m 30 -A "$UA" -o body -w "status=%{http_code} final=%{url_effective} type=%{content_type} size=%{size_download}\n" "$u" || echo "curl failed"
+            head -c 400 body | tr '\n' ' '; echo
+            grep -o 'ne20[0-9]\{11\}' body | sort -u | head -3
+          done
+      - name: ToKini Andy playlists
+        run: |
+          curl -sSL -m 30 -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/141.0" -H "Accept-Language: en-US" -b "CONSENT=YES+1; SOCS=CAI" -o yt.html "https://www.youtube.com/@TokiniAndy/playlists"
+          python3 - <<'PY'
+          import re, json
+          s = open('yt.html', encoding='utf-8', errors='ignore').read()
+          print('size', len(s))
+          seen = set()
+          for m in re.finditer(r'"contentId":"(PL[\w-]+)"', s):
+              pid = m.group(1)
+              if pid in seen: continue
+              seen.add(pid)
+              t = re.search(r'"title":\{"content":"([^"]+)"', s[m.end():m.end()+6000])
+              print(pid, '|', t.group(1) if t else '?')
+          for m in re.finditer(r'"playlistId":"(PL[\w-]+)"', s):
+              if m.group(1) not in seen:
+                  seen.add(m.group(1)); print('also', m.group(1))
+          PY
