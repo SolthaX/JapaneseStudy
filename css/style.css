@@ -491,3 +491,29 @@ main {
 @media (min-width: 1500px) {
   .badges { grid-template-columns: repeat(6, 1fr); }
 }
+
+/* ---------- My links ---------- */
+
+.links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 10px 6px; }
+.li {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 6px 2px;
+  border-radius: 14px; color: var(--ink); text-align: center; min-width: 0;
+}
+.li:hover { background: var(--sakura-soft); }
+.li-icon {
+  width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center;
+  background: var(--card-2); border: 1px solid var(--line); box-shadow: var(--shadow); overflow: hidden;
+}
+.li-emoji { font-size: 24px; line-height: 1; }
+.li-fav { width: 26px; height: 26px; }
+.li-letter { font-weight: 700; font-size: 20px; color: var(--sakura-deep); }
+.li-title { font-size: 11.5px; line-height: 1.2; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.link-row { display: flex; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.link-row .input { padding: 7px 10px; font-size: 14px; }
+.li-in-icon { width: 52px !important; text-align: center; font-size: 18px !important; flex: none; }
+.link-fields { display: flex; flex-direction: column; gap: 4px; }
+.link-btns { display: flex; gap: 4px; flex: none; }
+.link-btns .btn { padding: 6px 8px; }
+.link-btns .btn:disabled { opacity: 0.35; }
+.link-add { border-bottom: 0; }
+@media (max-width: 420px) { .link-btns { flex-direction: column; } }

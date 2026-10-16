@@ -1,7 +1,7 @@
 // Offline support: app shell is served stale-while-revalidate, news is network-first.
 // WaniKani API calls are cross-origin and never cached here.
 
-const CACHE = 'benkyo-v4';
+const CACHE = 'benkyo-v5';
 const SHELL = [
   './',
   'index.html',
@@ -13,6 +13,7 @@ const SHELL = [
   'js/curriculum.js',
   'js/jp.js',
   'js/sync.js',
+  'js/obsidian.js',
   'manifest.webmanifest',
   'icons/icon-192.png',
   'icons/apple-touch-icon.png',

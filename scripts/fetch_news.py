@@ -18,15 +18,17 @@ OUT = Path(__file__).resolve().parent.parent / "data" / "news.json"
 LIMIT = 25
 UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
 
+# Since NHK moved to NHK ONE (news.web.nhk), the NEWS WEB EASY list needs a login
+# token, so easy articles come from NHK Easier's RSS (same NHK Easy stories, with
+# furigana). The old www3 RSS still answers but froze in August 2026.
 EASY_SOURCES = [
-    ("https://www3.nhk.or.jp/news/easy/news-list.json", "https://www3.nhk.or.jp/news/easy/{id}/{id}.html"),
-    ("https://news.web.nhk/news/easy/news-list.json", "https://news.web.nhk/news/easy/{id}/{id}.html"),
-    ("https://www3.nhk.or.jp/news/easy/top-list.json", "https://www3.nhk.or.jp/news/easy/{id}/{id}.html"),
+    "https://nhkeasier.com/feed/",
 ]
 REGULAR_SOURCES = [
-    "https://www3.nhk.or.jp/rss/news/cat0.xml",
     "https://news.web.nhk/n-data/conf/na/rss/cat0.xml",
+    "https://www3.nhk.or.jp/rss/news/cat0.xml",
 ]
+MAX_AGE_DAYS = 7  # a feed whose newest item is older than this is treated as dead
 
 
 def get(url):
@@ -87,10 +89,23 @@ def parse_rss(raw):
     return items[:LIMIT]
 
 
+def fresh(items):
+    dates = [i["date"] for i in items if i.get("date")]
+    if not dates:
+        return True
+    newest = max(datetime.fromisoformat(d) for d in dates)
+    if newest.tzinfo is None:
+        newest = newest.replace(tzinfo=timezone.utc)
+    return (datetime.now(timezone.utc) - newest).days <= MAX_AGE_DAYS
+
+
 def first_working(sources, parse):
     for src in sources:
         try:
             items = parse(src)
+            if items and not fresh(items):
+                print(f"stale feed skipped: {src}", file=sys.stderr)
+                continue
             if items:
                 print(f"ok: {len(items)} items", file=sys.stderr)
                 return items
@@ -107,7 +122,7 @@ def main():
         except ValueError:
             previous = {}
 
-    easy = first_working(EASY_SOURCES, lambda s: parse_easy(get(s[0]), s[1]))
+    easy = first_working(EASY_SOURCES, lambda s: parse_rss(get(s)))
     regular = first_working(REGULAR_SOURCES, lambda s: parse_rss(get(s)))
 
     result = {
