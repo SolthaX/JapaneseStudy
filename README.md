@@ -1,4 +1,4 @@
-# 勉強 Benkyō — Japanese study planner
+# Benkyō — Japanese study planner
 
 A cherry-blossom themed web app for the iPhone home screen that tracks daily Japanese study:
 
@@ -24,12 +24,16 @@ No build step, no server: plain HTML/CSS/JS modules. Your data stays in the brow
 
 ## Home screen widget (Scriptable)
 
-iOS only lets native apps add widgets, so the widget runs in the free [Scriptable](https://apps.apple.com/app/scriptable/id1405459188) app (`widget/benkyo-widget.js`). It works in small, medium and **large** sizes; large shows everything: streak, WaniKani level/lessons/reviews, 24h forecast, daily goals, textbook chapter and pace, current book, 30-day bloom strip and the proverb.
+iOS only lets native apps add widgets, so the widget runs in the free [Scriptable](https://apps.apple.com/app/scriptable/id1405459188) app (`widget/benkyo-widget.js`). Three sizes, each with its own job:
+
+- **Large**: streak, WaniKani level/lessons/reviews, 24h forecast, daily goals, textbook chapter and pace, current book, 30-day bloom strip and the proverb.
+- **Medium (ribbon)**: the next grammar point to study (or next Quartet step) with your pace, and the latest NHK Easy headline (tap to open).
+- **Small**: reviews waiting, level and streak.
 
 1. Install Scriptable.
-2. In 勉強 tap ⚙︎ → **Copy widget script**. In Scriptable tap ＋, paste, and name the script **Benkyo Widget**.
-3. Back in 勉強 tap **Update widget 🌸**. This opens Scriptable with your progress and WaniKani token. The token is kept in the iOS Keychain.
-4. Long-press the home screen → ＋ → Scriptable → **Large** → add it, long-press it → *Edit Widget* → Script: **Benkyo Widget**.
+2. In Benkyō tap ⚙︎ → **Copy widget script**. In Scriptable tap ＋, paste, and name the script **Benkyo Widget**.
+3. Back in Benkyō tap **Update widget 🌸**. This opens Scriptable with your progress and WaniKani token. The token is kept in the iOS Keychain.
+4. Long-press the home screen → ＋ → Scriptable → pick a size → add it, long-press it → *Edit Widget* → Script: **Benkyo Widget**. Add as many sizes as you like; they all use the same script.
 
 WaniKani numbers refresh live on their own (iOS refreshes widgets roughly every 15–30 min). Goals, streak and book progress update each time you tap **Update widget** (also on the Today tab). Tapping the WaniKani tiles opens WaniKani.
 
