@@ -10,6 +10,8 @@ A cherry-blossom themed web app for the iPhone home screen that tracks daily Jap
 
 **Only kanji you know.** Japanese in the interface (labels, chapter titles, grammar points, proverbs, the widget) only uses kanji you've taken to Guru at least once on WaniKani. Words with other kanji appear in English, word by word, so the app turns more Japanese as you level up. Tap any Japanese word with kanji to see its reading. Each label is written as `[漢字|reading|English]` (see `js/jp.js`). News headlines and your own book titles are shown as they are.
 
+📄 **User manual:** [docs/Benkyo-User-Manual.pdf](docs/Benkyo-User-Manual.pdf)
+
 No build step, no server: plain HTML/CSS/JS modules. Your data stays in the browser's localStorage, so use **Settings → Export JSON** now and then to back it up.
 
 ## Integrations
