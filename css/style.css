@@ -67,6 +67,7 @@
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
 
 html, body { margin: 0; }
 
@@ -425,3 +426,68 @@ main {
   border: 5px solid transparent; border-bottom: 0; border-top-color: var(--ink);
 }
 @keyframes furi-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ---------- top bar actions ---------- */
+
+.top-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+#sync-badge { cursor: default; }
+
+/* ---------- dashboard columns (stack on phones) ---------- */
+
+.dash > .col { min-width: 0; }
+
+/* ---------- desktop: sidebar + two-column dashboard ---------- */
+
+@media (min-width: 1000px) {
+  :root { --sidebar: 210px; }
+
+  .topbar { padding: 18px 40px 12px calc(var(--sidebar) + 40px); z-index: 30; }
+  .topbar .brand { position: fixed; left: 22px; top: 22px; }
+
+  main {
+    max-width: 1360px;
+    margin: 0;
+    padding: 4px 40px 48px calc(var(--sidebar) + 40px);
+  }
+
+  .dash {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0 28px;
+    align-items: start;
+  }
+
+  .tabbar {
+    top: 0; right: auto; bottom: 0; width: var(--sidebar);
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 96px 14px 20px;
+    border-top: 0; border-right: 1px solid var(--line);
+  }
+  .tabbar button {
+    flex-direction: row; justify-content: flex-start; gap: 12px;
+    padding: 10px 14px; text-align: left;
+  }
+  .tab-ja { font-size: 20px; min-width: 2.2em; }
+  .tab-en { font-size: 14px; font-weight: 700; }
+
+  .tree-wrap { height: 230px; }
+  .greeting { font-size: 24px; }
+
+  .sheet {
+    top: 50%; bottom: auto; left: 50%; right: auto;
+    width: min(600px, calc(100vw - 80px)); max-height: 86vh;
+    transform: translate(-50%, -50%);
+    border-radius: 24px; padding: 18px 28px 28px;
+    animation: pop-in 0.18s ease-out;
+  }
+  @keyframes pop-in { from { opacity: 0; transform: translate(-50%, -46%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+  .sheet-grip { display: none; }
+
+  .toast { bottom: 28px; left: calc(50% + var(--sidebar) / 2); }
+  .badges { grid-template-columns: repeat(4, 1fr); }
+  .card { padding: 18px 20px; }
+}
+
+@media (min-width: 1500px) {
+  .badges { grid-template-columns: repeat(6, 1fr); }
+}

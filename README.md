@@ -37,6 +37,23 @@ iOS only lets native apps add widgets, so the widget runs in the free [Scriptabl
 
 WaniKani numbers refresh live on their own (iOS refreshes widgets roughly every 15–30 min). Goals, streak and book progress update each time you tap **Update widget** (also on the Today tab). Tapping the WaniKani tiles opens WaniKani.
 
+## On your computer (taskbar app)
+
+On a wide screen the app switches to a dashboard layout: sidebar navigation and two columns.
+
+1. Open the site in **Chrome** or **Edge**.
+2. Click **⬇ Install app** at the top (or the install icon in the address bar, or browser menu → *Install Benkyō*). It opens in its own window.
+3. Right-click its icon in the taskbar → **Pin to taskbar** (on macOS: right-click in the Dock → *Options → Keep in Dock*).
+
+## Sync phone ↔ computer
+
+Progress lives in each browser, so the app syncs it through one **secret gist** on your GitHub account:
+
+1. Create a classic token with only the **gist** permission: <https://github.com/settings/tokens/new?scopes=gist&description=Benky%C5%8D%20sync>.
+2. Paste it in ⚙︎ → *Sync phone ↔ computer* on every device. The first device creates the gist and the others find it.
+
+Each day of the log, each chapter, each book and the shared settings carry a change time. The newest version wins, so edits and deletions on either device carry over. Sync runs when the app opens and a few seconds after each change. Only progress is uploaded, never the WaniKani or GitHub token. A secret gist isn't listed publicly, but anyone with its link can read it.
+
 ## Put it online (GitHub Pages)
 
 > GitHub Pages on a **private** repository needs a paid GitHub plan (Pro). On a free account, either make the repository public (no secrets are stored in it: your token and progress stay on the phone) or deploy the folder for free with Cloudflare Pages or Netlify.

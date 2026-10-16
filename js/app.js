@@ -2,8 +2,9 @@ import { BOOKS, bookById, lessonSpec } from './curriculum.js';
 import { J, jx, T, jt, resolve, setKnown, dateSpec, monthSpec, numKana, DOW, installFurigana } from './jp.js';
 import {
   state, save, onChange, ACTIVITIES, activeGoals, dayLog, setActivity, today, dayKey, parseDay, addDays,
-  dayScore, streak, bestStreak, studyDaysInLast, exportData, importData,
+  dayScore, streak, bestStreak, studyDaysInLast, exportData, importData, persist,
 } from './store.js';
+import { syncNow } from './sync.js';
 import { syncWaniKani, loadNews, SRS_GROUPS } from './api.js';
 import {
   bookProgress, nextChapter, currentBook, peekChapter, chapterProgress, toggleStep, toggleGrammar,
@@ -204,7 +205,7 @@ function viewToday() {
   const doneCount = goals.filter((a) => log[a.id]).length;
   const [pjp, pen] = proverbOfDay();
 
-  return `
+  return `<div class="dash"><div class="col">
     <div class="card hero">
       ${studiedToday ? petals() : ''}
       <div class="hero-top">
@@ -230,6 +231,7 @@ function viewToday() {
           ${goalOpen(a)}
         </div>`).join('') || '<div class="empty">No goals enabled — pick some in settings ⚙︎</div>'}
     </div>
+    </div><div class="col">
 
     ${section('ワニカニ', 'WaniKani', state.settings.wkToken ? `<button class="btn small ghost" data-action="sync-wk">${busy.wk ? '…' : '↻ Sync'}</button>` : '')}
     ${wkCard()}
@@ -240,15 +242,15 @@ function viewToday() {
     ${section('[教科書|きょうかしょ|Textbook]', 'Textbook')}
     ${textbookCard(currentBook().id, true)}
 
-    ${section('ウィジェット', 'Widget')}
+    ${IS_IOS ? `${section('ウィジェット', 'Widget')}
     <div class="card"><div class="row between">
       <div class="grow"><h3>Home screen widget</h3><div class="sub">${state.widgetSyncedAt ? `Updated ${new Date(state.widgetSyncedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}${dayKey(new Date(state.widgetSyncedAt)) === today() ? '' : ` · ${shortDate(dayKey(new Date(state.widgetSyncedAt)))}`}` : 'Set it up in ⚙︎ Settings'}</div></div>
-      <button class="btn primary small" data-action="update-widget">Update 🌸</button></div></div>
+      <button class="btn primary small" data-action="update-widget">Update 🌸</button></div></div>` : ''}
 
     ${section("[今日|きょう|Today's]の[ことわざ|ことわざ|proverb]", 'Proverb of the day')}
     <div class="card proverb">${jx(pjp) ? `<div class="jp">${jx(pjp)}</div>` : ''}<div style="margin-top:6px">${pen}</div>
     ${jx(pjp) ? '<div class="muted small" style="margin-top:6px">Tap a kanji to see its reading.</div>' : ''}</div>
-  `;
+  </div></div>`;
 }
 
 function wkCard() {
@@ -333,20 +335,22 @@ function viewBooks() {
   const id = selectedBook || currentBook().id;
   const book = bookById(id);
   const prog = bookProgress(id);
-  return `
+  return `<div class="dash"><div class="col">
     <div class="segmented" style="margin-top:12px">${BOOKS.map((b) => `<button class="${b.id === id ? 'on' : ''}" data-action="pick-book" data-book="${b.id}">${b.title}</button>`).join('')}</div>
     ${textbookCard(id, false)}
     <div class="row" style="justify-content:flex-end;gap:8px;margin-bottom:4px">
       ${prog.ratio < 1 ? `<button class="btn small ghost" data-action="book-complete" data-book="${id}">Mark whole book done</button>` : ''}
       ${prog.done > 0 ? `<button class="btn small danger" data-action="book-reset" data-book="${id}">Reset</button>` : ''}
     </div>
-    ${section('[課|か|Chapters]', 'Chapters')}
-    ${book.chapters.map((c) => chapterHTML(book, c)).join('')}
     ${section('リンク', 'Links')}
     <div class="link-list">
       <a class="link-tile" href="https://www.youtube.com/@TokiniAndy/playlists" target="_blank" rel="noopener"><span style="font-size:22px">▶︎</span><div class="grow"><b>ToKini Andy playlists</b><span>Genki & Quartet grammar videos</span></div>↗</a>
       <a class="link-tile" href="https://sydney.jpf.go.jp/japanese-studies/resources/japanese-conjugation-practice/" target="_blank" rel="noopener"><span style="font-size:22px">🔁</span><div class="grow"><b>Conjugation practice</b><span>The Japan Foundation, Sydney</span></div>↗</a>
-    </div>`;
+    </div>
+    </div><div class="col">
+    ${section('[課|か|Chapters]', 'Chapters')}
+    ${book.chapters.map((c) => chapterHTML(book, c)).join('')}
+    </div></div>`;
 }
 
 function chapterHTML(book, c) {
@@ -402,7 +406,7 @@ function viewCalendar() {
 
   const total = Object.keys(state.log).filter((k) => dayScore(k)).length;
 
-  return `
+  return `<div class="dash"><div class="col">
     <div class="stats" style="margin-top:14px">
       <div class="stat"><b style="color:var(--sakura-deep)">${streak()}</b><span>${bi('Streak', '[連続|れんぞく|]')}</span></div>
       <div class="stat"><b>${bestStreak()}</b><span>${bi('Best', '[最高|さいこう|]')}</span></div>
@@ -420,6 +424,7 @@ function viewCalendar() {
       <div class="act-legend">${ACTIVITIES.map((a) => `<span><i style="background:${a.color}"></i>${a.en}</span>`).join('')}</div>
       <p class="sub small" style="margin-bottom:0">Tap a day to log or edit what you studied.</p>
     </div>
+    </div><div class="col">
 
     ${section('[半年|はんとし|Last 6 months]', 'Last 6 months')}
     <div class="card"><div class="year-strip">${strip}</div>
@@ -427,7 +432,8 @@ function viewCalendar() {
 
     ${section('[実績|じっせき|Achievements]', 'Achievements', `<span class="sub">${Object.keys(state.badges).length}/${BADGES.length}</span>`)}
     <div class="badges">${BADGES.map((b) => `<div class="badge ${state.badges[b.id] ? '' : 'locked'}" title="${state.badges[b.id] ? `Earned ${state.badges[b.id]}` : 'Locked'}">
-      <div class="b-icon">${b.icon}</div>${jx(b.ja) ? `<div class="b-ja">${jx(b.ja)}</div>` : ''}<div class="b-en">${b.en}</div></div>`).join('')}</div>`;
+      <div class="b-icon">${b.icon}</div>${jx(b.ja) ? `<div class="b-ja">${jx(b.ja)}</div>` : ''}<div class="b-en">${b.en}</div></div>`).join('')}</div>
+    </div></div>`;
 }
 
 const STATUSES = [['reading', '[読書中|どくしょちゅう|]', 'Reading'], ['planned', '[積読|つんどく|]', 'Planned'], ['finished', '[読了|どくりょう|]', 'Finished']];
@@ -457,13 +463,14 @@ function readingItem(b) {
 
 function viewReading() {
   const groups = [['reading', '[読書中|どくしょちゅう|Reading now]', 'Reading now'], ['planned', '[積読|つんどく|Up next]', 'Up next'], ['finished', '[読了|どくりょう|Finished]', 'Finished']];
-  return `
+  return `<div class="dash"><div class="col">
     <div style="height:4px"></div>
     ${groups.map(([st, ja, en]) => {
       const list = state.reading.filter((b) => b.status === st);
       return list.length ? `${section(ja, en)}${list.map(readingItem).join('')}` : '';
     }).join('')}
     ${state.reading.length ? '' : '<div class="empty">No books yet. Add the one you are reading — every page counts toward your streak. 📚</div>'}
+    </div><div class="col">
     <div style="height:12px"></div>
     <details class="card chapter" ${state.reading.length ? '' : 'open'}>
       <summary><span class="ch-num">＋</span><span class="grow ch-title">${J('[本|ほん|book]を[追加|ついか|add]', 'Add a book')}${resolve('[本|ほん|book]を[追加|ついか|add]', 'x').jp ? '<span class="en">Add a book</span>' : ''}</span></summary>
@@ -480,7 +487,8 @@ function viewReading() {
     <div class="link-list">
       <a class="link-tile" href="https://learnnatively.com/" target="_blank" rel="noopener"><span style="font-size:22px">📚</span><div class="grow"><b>Natively</b><span>Graded library, reading log & book clubs</span></div>↗</a>
       <a class="link-tile" href="https://community.wanikani.com/search?q=book%20club" target="_blank" rel="noopener"><span style="font-size:22px">🐊</span><div class="grow"><b>WaniKani book clubs</b><span>Absolute beginner, beginner & intermediate clubs</span></div>↗</a>
-    </div>`;
+    </div>
+    </div></div>`;
 }
 
 function viewNews() {
@@ -489,7 +497,7 @@ function viewNews() {
   }
   const items = news?.[newsTab] || [];
   const readCount = Object.values(state.newsRead).filter((d) => d === today()).length;
-  return `
+  return `<div class="dash"><div class="col">
     <div class="segmented" style="margin-top:12px">
       <button class="${newsTab === 'easy' ? 'on' : ''}" data-action="news-tab" data-v="easy">やさしい Easy</button>
       <button class="${newsTab === 'regular' ? 'on' : ''}" data-action="news-tab" data-v="regular">ニュース Regular</button>
@@ -504,12 +512,14 @@ function viewNews() {
             ${n.date ? `<div class="news-date">${esc(new Date(n.date).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))}</div>` : ''}</div></div>`).join('')
         : `<div class="empty">${newsError || !news ? (newsError ? 'Headlines are not available yet.' : 'Loading…') : 'No headlines in this feed right now.'}<br>Open the sites directly below.</div>`}
     </div>
+    </div><div class="col">
     ${section('リンク', 'Links')}
     <div class="link-list">
       <a class="link-tile" href="https://www3.nhk.or.jp/news/easy/" target="_blank" rel="noopener" data-action="read-news" data-url="nhk-easy-site"><span style="font-size:22px">🗞️</span><div class="grow"><b>NHK NEWS WEB EASY</b><span>${jx('やさしい[日本語|にほんご|]の')}ニュース · furigana & audio</span></div>↗</a>
       <a class="link-tile" href="https://www3.nhk.or.jp/news/" target="_blank" rel="noopener" data-action="read-news" data-url="nhk-site"><span style="font-size:22px">📺</span><div class="grow"><b>NHK NEWS WEB</b><span>Regular news</span></div>↗</a>
     </div>
-    <p class="sub small center">Tapping a headline logs “Read the news” for today.</p>`;
+    <p class="sub small center">Tapping a headline logs “Read the news” for today.</p>
+    </div></div>`;
 }
 
 const VIEWS = { today: viewToday, calendar: viewCalendar, books: viewBooks, reading: viewReading, news: viewNews };
@@ -594,6 +604,18 @@ function openSettings() {
       <input class="input" type="password" autocomplete="off" data-setting="wkToken" value="${esc(s.wkToken)}" placeholder="xxxxxxxx-xxxx-…">
       <small>Create one at <a href="https://www.wanikani.com/settings/personal_access_tokens" target="_blank" rel="noopener">wanikani.com → Settings → API tokens</a> (default read-only permissions are enough). Stored only on this device.</small></label>
     <button class="btn small" data-action="sync-wk">Test connection</button>
+
+    <h3 style="margin:18px 0 0">Sync phone ↔ computer</h3>
+    <p class="sub">Keeps your progress identical on every device through a secret gist on your GitHub account. WaniKani and GitHub tokens are never uploaded.</p>
+    <label class="field"><span>GitHub token (gist permission only)</span>
+      <input class="input" type="password" autocomplete="off" data-setting="gistToken" value="${esc(s.gistToken)}" placeholder="github_pat_… or ghp_…">
+      <small>Create it at <a href="https://github.com/settings/tokens/new?scopes=gist&description=Benky%C5%8D%20sync" target="_blank" rel="noopener">github.com → Settings → Developer settings → Tokens (classic)</a>, tick only <b>gist</b>, no expiration. Paste the same token on each device.</small></label>
+    <div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn small" data-action="sync-now">Sync now</button>
+      <span class="sub small">${syncStatus()}</span></div>
+
+    ${deferredInstall ? `<h3 style="margin:18px 0 0">Install on this computer</h3>
+    <p class="sub">Opens Benkyō in its own window; then right-click its taskbar icon → Pin to taskbar.</p>
+    <button class="btn" data-action="install">Install app</button>` : ''}
 
     <h3 style="margin:18px 0 0">ウィジェット Home screen widget</h3>
     <p class="sub">Uses the free <a href="https://apps.apple.com/app/scriptable/id1405459188" target="_blank" rel="noopener">Scriptable</a> app (small, medium or large widget).</p>
@@ -750,6 +772,56 @@ async function copyWidgetScript() {
   toast('Widget script copied — paste it into Scriptable');
 }
 
+// ---------- phone ↔ computer sync ----------
+
+function syncStatus() {
+  if (!state.settings.gistToken) return 'Not set up.';
+  if (state.syncError) return `⚠︎ ${esc(state.syncError)}`;
+  if (state.syncedAt) return `Last synced ${new Date(state.syncedAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} ✓`;
+  return 'Waiting for first sync…';
+}
+
+let syncTimer;
+function scheduleSync(delay = 4000) {
+  if (!state.settings.gistToken) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => syncNow().catch(() => {}).finally(updateSyncBadge), delay);
+}
+
+function updateSyncBadge() {
+  const el = $('#sync-badge');
+  if (!el) return;
+  el.hidden = !state.settings.gistToken;
+  el.textContent = state.syncError ? '⚠︎ Sync' : '☁︎ Synced';
+  el.title = syncStatus();
+}
+
+// ---------- desktop install ----------
+
+const IS_IOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+let deferredInstall = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstall = e;
+  const btn = $('#install-btn');
+  if (btn) btn.hidden = false;
+});
+window.addEventListener('appinstalled', () => {
+  deferredInstall = null;
+  const btn = $('#install-btn');
+  if (btn) btn.hidden = true;
+  toast('Installed — right-click its taskbar icon → Pin to taskbar');
+});
+
+async function installApp() {
+  if (!deferredInstall) return toast('Use your browser menu → Install Benkyō');
+  deferredInstall.prompt();
+  await deferredInstall.userChoice;
+  deferredInstall = null;
+  const btn = $('#install-btn');
+  if (btn) btn.hidden = true;
+}
+
 // ---------- sync ----------
 
 async function runSync(kind, force) {
@@ -795,6 +867,13 @@ document.addEventListener('click', (e) => {
     case 'sync-wk': return runSync('wk', true);
     case 'update-widget': return updateWidget();
     case 'copy-widget': return copyWidgetScript();
+    case 'install': return installApp();
+    case 'sync-now':
+      syncNow()
+        .then(() => toast('Synced ✓'))
+        .catch((err) => toast(`⚠︎ ${err.message}`))
+        .finally(() => { updateSyncBadge(); if (!$('#sheet').hidden) openSettings(); });
+      return;
     case 'pick-book': selectedBook = el.dataset.book; return render();
     case 'step': return toggleStep(el.dataset.book, n, el.dataset.step);
     case 'grammar': return toggleGrammar(el.dataset.book, n, Number(el.dataset.i));
@@ -863,6 +942,7 @@ document.addEventListener('change', (e) => {
     save();
     if (el.dataset.setting === 'theme') applyTheme();
     if (el.dataset.setting === 'wkToken') { delete state.cache.wk; save(); }
+    if (el.dataset.setting === 'gistToken') { state.settings.gistId = ''; state.syncError = null; persist(); scheduleSync(0); }
     return;
   }
   if (el.dataset.goal) {
@@ -916,7 +996,8 @@ document.addEventListener('input', (e) => {
     if (el.value.trim()) entry.note = el.value;
     else delete entry.note;
     if (!Object.keys(entry).length) delete state.log[el.dataset.day];
-    try { localStorage.setItem('benkyo-v1', JSON.stringify(state)); } catch { /* ignore */ }
+    persist();
+    scheduleSync();
   }
 });
 
@@ -952,6 +1033,7 @@ onChange(() => {
   const earned = checkBadges();
   if (earned.length) toast(`${earned[0].icon} ${jt('[実績解除|じっせきかいじょ|]！') || 'Unlocked!'} ${earned[0].en}`);
   if ($('#sheet').hidden) render();
+  scheduleSync();
 });
 
 window.addEventListener('hashchange', () => setTab((location.hash || '#today').slice(1)));
@@ -960,6 +1042,7 @@ window.addEventListener('hashchange', () => setTab((location.hash || '#today').s
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
     runSync('wk', false);
+    scheduleSync(0);
     render();
   }
 });
@@ -972,6 +1055,8 @@ applyTheme();
 render();
 checkBadges();
 runSync('wk', false);
+scheduleSync(0);
+updateSyncBadge();
 
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});
