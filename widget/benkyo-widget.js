@@ -8,7 +8,8 @@
 // file, then in the Benkyō app tap ⚙︎ → "Update widget". The app sends your goals,
 // streak, textbook and reading progress (plus your WaniKani token, stored in the
 // iOS Keychain). WaniKani numbers are fetched live each time the widget refreshes.
-// Works in small, medium and large sizes — large shows everything.
+// Large: WaniKani, goals, textbook, bloom strip. Medium (ribbon): next grammar
+// point and the latest NHK Easy headline. Small: reviews and streak.
 
 const fm = FileManager.local();
 const DIR = fm.joinPath(fm.documentsDirectory(), 'benkyo');
@@ -310,31 +311,36 @@ function forecastSection(w, wkData, width) {
   const total = wkData.forecast.reduce((a, b) => a + b, 0);
   txt(head, `${total} reviews · ${wkData.doneToday} done today${wkData.stale ? ' · offline' : ''}`, 10, C.muted, 'medium');
   w.addSpacer(3);
-  const img = w.addImage(forecastImage(width, 30, wkData.forecast));
-  img.imageSize = new Size(width, 30);
+  if (!total) {
+    // Flat bars say nothing: everything is already due.
+    const box = hstack(w);
+    box.size = new Size(0, 26);
+    txt(box, wkData.reviews ? `Nothing new coming — ${wkData.reviews} reviews waiting now 🐊` : 'No reviews in the next 24h 🌸', 11, C.muted, 'medium');
+    return;
+  }
+  const img = w.addImage(forecastImage(width, 26, wkData.forecast));
+  img.imageSize = new Size(width, 26);
 }
 
-function goalsSection(w, data, compact) {
+function goalsSection(w, data) {
   const done = data.goals.filter((g) => g.done).length;
   const head = hstack(w);
   txt(head, lab('goals', 'Daily goals'), 11, C.ink, 'bold');
   head.addSpacer();
   txt(head, done === data.goals.length && done ? lab('allDone', 'Great work!') : `${done}/${data.goals.length}`, 11, C.pink, 'bold');
-  w.addSpacer(compact ? 4 : 5);
+  w.addSpacer(5);
   const row = hstack(w);
   data.goals.forEach((g, i) => {
     if (i) row.addSpacer();
     const cell = vstack(row, 2);
     cell.centerAlignContent();
-    cell.size = new Size(compact ? 48 : 42, compact ? 30 : 40);
+    cell.size = new Size(42, 40);
     cell.cornerRadius = 10;
     cell.backgroundColor = g.done ? new Color('#e0457b', 0.9) : C.tile;
     const top = hstack(cell, 3);
     top.addSpacer();
-    txt(top, g.icon, compact ? 13 : 15);
-    if (compact && g.done) txt(top, '✓', 11, Color.white(), 'bold');
+    txt(top, g.icon, 15);
     top.addSpacer();
-    if (compact) return;
     const bot = hstack(cell);
     bot.addSpacer();
     txt(bot, g.done ? '✓' : g.label, g.done ? 11 : 8, g.done ? Color.white() : C.muted, 'bold');
@@ -373,6 +379,69 @@ function heatSection(w, data, width) {
   img.imageSize = new Size(width, 12);
 }
 
+// ---------- medium "ribbon": next grammar + NHK Easy headline ----------
+
+async function loadHeadline(snap) {
+  const cache = fm.joinPath(DIR, 'news.json');
+  const pick = (j) => (j && ((j.easy || [])[0] || (j.regular || [])[0])) || null;
+  if (!snap || !snap.appUrl) return pick(readJSON(cache));
+  try {
+    const req = new Request(`${snap.appUrl.replace(/[^/]*$/, '')}data/news.json?t=${Math.floor(Date.now() / 600000)}`);
+    req.timeoutInterval = 15;
+    const json = await req.loadJSON();
+    fm.writeString(cache, JSON.stringify(json));
+    return pick(json);
+  } catch (e) {
+    return pick(readJSON(cache));
+  }
+}
+
+function ribbon(w, data, headline) {
+  const now = new Date();
+  const top = hstack(w, 4);
+  txt(top, lab('brand', '🌸 Benkyō'), 13, C.pink, 'bold');
+  top.addSpacer(6);
+  txt(top, dateText(now), 10, C.muted, 'medium');
+  top.addSpacer();
+  txt(top, '🔥', 11);
+  txt(top, data ? data.streak : '–', 14, C.pink, 'bold');
+  w.addSpacer(7);
+
+  const g = data && data.grammar;
+  const gram = vstack(w, 2);
+  gram.backgroundColor = C.tile;
+  gram.cornerRadius = 12;
+  gram.setPadding(6, 10, 6, 10);
+  const gh = hstack(gram, 4);
+  txt(gh, `📖 ${g && g.step ? lab('step', 'Next step') : lab('grammar', 'Next grammar')}`, 10, C.muted, 'bold');
+  if (g && g.of) txt(gh, `${g.n}/${g.of}`, 10, C.muted, 'medium');
+  gh.addSpacer();
+  const pace = data && data.book && data.book.pace;
+  if (pace) pill(gh, pace.label, pace.kind === 'behind' ? C.warn : pace.kind === 'ahead' ? C.ok : C.ai);
+  const gRow = hstack(gram);
+  txt(gRow, g ? g.point : data ? 'All grammar done 🎉' : 'Open Benkyō → “Update widget”', 15, C.ink, 'bold');
+  gRow.addSpacer();
+  if (g) {
+    const wRow = hstack(gram);
+    txt(wRow, g.where, 10, C.muted, 'medium');
+    wRow.addSpacer();
+  }
+  w.addSpacer(6);
+
+  const news = vstack(w, 1);
+  news.backgroundColor = C.tile;
+  news.cornerRadius = 12;
+  news.setPadding(6, 10, 6, 10);
+  if (headline) news.url = headline.url;
+  const nh = hstack(news);
+  txt(nh, `📰 ${lab('news', 'NHK Easy')}`, 10, C.muted, 'bold');
+  nh.addSpacer();
+  const nRow = hstack(news);
+  const t = txt(nRow, headline ? headline.title : 'Headlines appear once the site is online', 12, C.ink, 'medium');
+  t.lineLimit = 2;
+  nRow.addSpacer();
+}
+
 function emptyState(w) {
   w.addSpacer();
   txt(w, 'Open Benkyō → ⚙︎ → “Update widget”', 12, C.ink, 'bold');
@@ -397,9 +466,10 @@ async function build(family) {
   w.refreshAfterDate = new Date(Date.now() + 15 * 60 * 1000);
   if (snap && snap.appUrl) w.url = snap.appUrl;
 
-  const screen = Device.screenSize();
-  const short = Math.min(screen.width, screen.height);
-  const width = (family === 'small' ? short / 2 - 22 : short - 29) - 30; // widget width minus padding
+  // Scriptable can't measure the widget and iOS sizes vary by model and version
+  // (a large widget is ~342pt wide on recent iOS), so drawings use a width that
+  // fits every current iPhone; stacks still stretch to the real size.
+  const width = family === 'small' ? 124 : 296;
 
   if (family === 'small') {
     const top = hstack(w, 3);
@@ -423,18 +493,16 @@ async function build(family) {
     return { w, synced };
   }
 
-  const medium = family === 'medium';
-  header(w, data, !medium);
-  w.addSpacer(medium ? 6 : 8);
-  wkSection(w, wkData, width, medium ? 42 : 50);
-
-  if (medium) {
-    w.addSpacer(6);
-    if (data) goalsSection(w, data, true);
-    else emptyState(w);
+  if (family === 'medium') {
+    w.setPadding(12, 14, 12, 14);
+    const headline = await loadHeadline(snap);
+    ribbon(w, data, headline);
     return { w, synced };
   }
 
+  header(w, data, true);
+  w.addSpacer(8);
+  wkSection(w, wkData, width, 50);
   w.addSpacer(8);
   forecastSection(w, wkData, width);
   w.addSpacer(10);

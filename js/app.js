@@ -659,6 +659,23 @@ async function exportBackup() {
 
 const WIDGET_SCRIPT = 'Benkyo Widget';
 
+/** First grammar point not yet checked (or, for Quartet, the next chapter step). */
+function nextGrammar() {
+  const start = BOOKS.indexOf(currentBook());
+  for (const b of BOOKS.slice(start)) {
+    for (const c of b.chapters) {
+      if (chapterProgress(b.id, c.n) >= 1) continue;
+      const st = peekChapter(b.id, c.n);
+      const where = `${b.title} · ${chapterText(c.n, c.ja, c.en)}`;
+      const i = c.grammar.findIndex((_, j) => !st.grammar[j]);
+      if (i >= 0) return { point: T(c.grammar[i]), where, n: i + 1, of: c.grammar.length };
+      const step = b.steps.find((x) => !st.steps[x.id]);
+      if (step) return { point: optLabel(step.ja, step.en), where, step: true };
+    }
+  }
+  return null;
+}
+
 function widgetPayload() {
   const t = today();
   const heat = [];
@@ -688,6 +705,7 @@ function widgetPayload() {
     book: { title: b.title, next: ch ? chapterText(ch.n, ch.ja, ch.en) : null, ratio: prog.ratio, done: Math.floor(prog.done), total: prog.total, pace },
     reading: r ? { title: r.title, current: r.current || 0, pages: r.pages || 0 } : null,
     proverb: { ja: jt(pja), en: pen },
+    grammar: nextGrammar(),
     dateKanji: [...'月日火水木金土'].filter((k) => jt(`[${k}|x|]`)).join(''),
     labels: {
       brand: jt('[勉強|べんきょう|]') ? `${jt('[桜|さくら|]') || '🌸'} ${jt('[勉強|べんきょう|]')}` : '🌸 Benkyō',
@@ -703,6 +721,9 @@ function widgetPayload() {
       goalsShort: jt('[目標|もくひょう|]') || 'Goals',
       allDone: T('お[疲れ様|つかれさま|good work]！', 'Great work!'),
       bloom: plain('days in bloom', '[開花|かいか|]'),
+      grammar: plain('Next grammar', '[文法|ぶんぽう|]'),
+      step: plain('Next step', '[次|つぎ|]'),
+      news: 'NHK やさしいニュース',
     },
     appUrl: location.href.split('#')[0],
     token: state.settings.wkToken || '',
