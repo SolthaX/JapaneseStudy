@@ -28,7 +28,11 @@
         <div class="brand-date" id="today-label"></div>
       </div>
     </div>
-    <button class="icon-btn" data-action="open-settings" aria-label="Settings">⚙︎</button>
+    <div class="top-actions">
+      <span class="pill" id="sync-badge" hidden></span>
+      <button class="btn small" id="install-btn" data-action="install" hidden>⬇ Install app</button>
+      <button class="icon-btn" data-action="open-settings" aria-label="Settings">⚙︎</button>
+    </div>
   </header>
 
   <main id="view" tabindex="-1"></main>

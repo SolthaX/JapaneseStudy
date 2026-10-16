@@ -20,6 +20,8 @@ const defaults = () => ({
     goals: { wk: true, bunpro: true, textbook: true, conj: true, reading: true, news: false },
     targets: {}, // bookId -> { start: 'YYYY-MM-DD', end: 'YYYY-MM-DD' }
     theme: 'auto',
+    gistToken: '', // GitHub token (gist scope) for phone ↔ computer sync
+    gistId: '',
   },
   log: {}, // 'YYYY-MM-DD' -> { wk, bunpro, textbook, conj, reading, news, minutes, note }
   books: {}, // bookId -> { [chapterNumber]: { steps: {stepId:true}, grammar: {i:true}, done: 'YYYY-MM-DD' } }
@@ -28,6 +30,8 @@ const defaults = () => ({
   badges: {}, // badgeId -> 'YYYY-MM-DD'
   cache: {}, // WaniKani API snapshot
   widgetSyncedAt: null,
+  stamps: {}, // sync unit -> last change time (ms), see units()
+  syncedAt: null,
 });
 
 function merge(base, extra) {
@@ -55,13 +59,127 @@ export const state = load();
 const listeners = new Set();
 export const onChange = (fn) => listeners.add(fn);
 
-export function save() {
+// ---------- sync units ----------
+// Progress is split into small units (one day of the log, one chapter, one book
+// you read, the shared settings). Each save stamps the units that changed, so two
+// devices can merge by keeping the most recent version of each unit.
+
+const SHARED_SETTINGS = ['name', 'goals', 'targets', 'theme'];
+
+export function units(s = state) {
+  const u = {};
+  for (const [day, v] of Object.entries(s.log || {})) u[`log:${day}`] = v;
+  for (const [b, chapters] of Object.entries(s.books || {})) {
+    for (const [n, v] of Object.entries(chapters)) u[`book:${b}:${n}`] = v;
+  }
+  for (const r of s.reading || []) u[`read:${r.id}`] = r;
+  u.settings = Object.fromEntries(SHARED_SETTINGS.map((k) => [k, s.settings?.[k]]));
+  return u;
+}
+
+const serialize = (u) => Object.fromEntries(Object.entries(u).map(([k, v]) => [k, JSON.stringify(v)]));
+let lastUnits = serialize(units());
+
+function stampChanges() {
+  const cur = serialize(units());
+  const now = Date.now();
+  for (const k of new Set([...Object.keys(cur), ...Object.keys(lastUnits)])) {
+    if (cur[k] !== lastUnits[k]) state.stamps[k] = now;
+  }
+  lastUnits = cur;
+}
+
+function write() {
   try {
     localStorage.setItem(KEY, JSON.stringify(state));
   } catch (e) {
     console.warn('Could not save', e);
   }
+}
+
+/** Saves without re-rendering (typing in a note, sync bookkeeping). */
+export function persist() {
+  stampChanges();
+  write();
+}
+
+export function save() {
+  persist();
   listeners.forEach((fn) => fn());
+}
+
+function setUnit(key, value) {
+  const [kind, a, b] = key.split(':');
+  if (kind === 'log') {
+    if (value) state.log[a] = value;
+    else delete state.log[a];
+  } else if (kind === 'book') {
+    if (value) (state.books[a] ||= {})[b] = value;
+    else if (state.books[a]) delete state.books[a][b];
+  } else if (kind === 'read') {
+    const i = state.reading.findIndex((r) => r.id === a);
+    if (value && i >= 0) state.reading[i] = value;
+    else if (value) state.reading.push(value);
+    else if (i >= 0) state.reading.splice(i, 1);
+  } else if (kind === 'settings' && value) {
+    Object.assign(state.settings, value);
+  }
+}
+
+/** What goes to the gist: progress only, never tokens or API caches. */
+export function syncPayload() {
+  return {
+    benkyoSync: 1,
+    stamps: state.stamps,
+    settings: Object.fromEntries(SHARED_SETTINGS.map((k) => [k, state.settings[k]])),
+    log: state.log,
+    books: state.books,
+    reading: state.reading,
+    newsRead: state.newsRead,
+    badges: state.badges,
+  };
+}
+
+/**
+ * Merges another device's payload; the newest version of each unit wins.
+ * On a device's first sync, ties (data never edited since stamping began) go to
+ * the gist, so a fresh computer adopts the phone's settings. Returns true if anything changed.
+ */
+export function mergeRemote(remote, firstSync = false) {
+  if (!remote?.benkyoSync) return false;
+  const local = serialize(units());
+  const theirs = serialize(units({ ...remote, settings: remote.settings }));
+  const rs = remote.stamps || {};
+  let changed = false;
+  const keys = new Set([...Object.keys(local), ...Object.keys(theirs), ...Object.keys(rs)]);
+  for (const k of keys) {
+    const mine = state.stamps[k] || 0;
+    const other = rs[k] || 0;
+    // Newer wins; on a tie, fill in what this device doesn't have.
+    const take = other > mine || (other === mine && k in theirs && (firstSync || !(k in local)));
+    if (take && local[k] !== theirs[k]) {
+      setUnit(k, theirs[k] === undefined ? undefined : JSON.parse(theirs[k]));
+      changed = true;
+    }
+    if (other > mine) state.stamps[k] = other;
+  }
+  for (const [url, day] of Object.entries(remote.newsRead || {})) {
+    if (!state.newsRead[url]) {
+      state.newsRead[url] = day;
+      changed = true;
+    }
+  }
+  for (const [id, day] of Object.entries(remote.badges || {})) {
+    if (!state.badges[id] || day < state.badges[id]) {
+      state.badges[id] = day;
+      changed = true;
+    }
+  }
+  // Merged values came with their own stamps: don't re-stamp them as local edits.
+  lastUnits = serialize(units());
+  write();
+  if (changed) listeners.forEach((fn) => fn());
+  return changed;
 }
 
 export function exportData() {
@@ -73,6 +191,8 @@ export function importData(json) {
   if (!data || typeof data !== 'object' || !data.settings) throw new Error('Not a Benkyō backup file');
   for (const k of Object.keys(state)) delete state[k];
   Object.assign(state, merge(defaults(), data));
+  // An imported backup counts as a fresh edit of everything it contains.
+  lastUnits = {};
   save();
 }
 

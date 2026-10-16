@@ -10,6 +10,8 @@ A cherry-blossom themed web app for the iPhone home screen that tracks daily Jap
 
 **Only kanji you know.** Japanese in the interface (labels, chapter titles, grammar points, proverbs, the widget) only uses kanji you've taken to Guru at least once on WaniKani. Words with other kanji appear in English, word by word, so the app turns more Japanese as you level up. Tap any Japanese word with kanji to see its reading. Each label is written as `[漢字|reading|English]` (see `js/jp.js`). News headlines and your own book titles are shown as they are.
 
+📄 **User manual:** [docs/Benkyo-User-Manual.pdf](docs/Benkyo-User-Manual.pdf)
+
 No build step, no server: plain HTML/CSS/JS modules. Your data stays in the browser's localStorage, so use **Settings → Export JSON** now and then to back it up.
 
 ## Integrations
@@ -36,6 +38,23 @@ iOS only lets native apps add widgets, so the widget runs in the free [Scriptabl
 4. Long-press the home screen → ＋ → Scriptable → pick a size → add it, long-press it → *Edit Widget* → Script: **Benkyo Widget**. Add as many sizes as you like; they all use the same script.
 
 WaniKani numbers refresh live on their own (iOS refreshes widgets roughly every 15–30 min). Goals, streak and book progress update each time you tap **Update widget** (also on the Today tab). Tapping the WaniKani tiles opens WaniKani.
+
+## On your computer (taskbar app)
+
+On a wide screen the app switches to a dashboard layout: sidebar navigation and two columns.
+
+1. Open the site in **Chrome** or **Edge**.
+2. Click **⬇ Install app** at the top (or the install icon in the address bar, or browser menu → *Install Benkyō*). It opens in its own window.
+3. Right-click its icon in the taskbar → **Pin to taskbar** (on macOS: right-click in the Dock → *Options → Keep in Dock*).
+
+## Sync phone ↔ computer
+
+Progress lives in each browser, so the app syncs it through one **secret gist** on your GitHub account:
+
+1. Create a classic token with only the **gist** permission: <https://github.com/settings/tokens/new?scopes=gist&description=Benky%C5%8D%20sync>.
+2. Paste it in ⚙︎ → *Sync phone ↔ computer* on every device. The first device creates the gist and the others find it.
+
+Each day of the log, each chapter, each book and the shared settings carry a change time. The newest version wins, so edits and deletions on either device carry over. Sync runs when the app opens and a few seconds after each change. Only progress is uploaded, never the WaniKani or GitHub token. A secret gist isn't listed publicly, but anyone with its link can read it.
 
 ## Put it online (GitHub Pages)
 
