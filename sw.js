@@ -1,7 +1,7 @@
 // Offline support: app shell is served stale-while-revalidate, news is network-first.
-// API calls (WaniKani, Bunpro) are cross-origin and never cached here.
+// WaniKani API calls are cross-origin and never cached here.
 
-const CACHE = 'benkyo-v1';
+const CACHE = 'benkyo-v2';
 const SHELL = [
   './',
   'index.html',

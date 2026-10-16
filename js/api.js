@@ -1,4 +1,4 @@
-// WaniKani (official v2 API, CORS-enabled) and Bunpro (legacy key API, best effort).
+// WaniKani (official v2 API, CORS-enabled) and the news file.
 
 import { state, save, today, setActivity, dayLog } from './store.js';
 
@@ -56,8 +56,8 @@ export async function syncWaniKani({ force = false } = {}) {
   midnight.setHours(0, 0, 0, 0);
   let doneToday = prev.doneTodayKey === today() ? prev.doneToday : 0;
   try {
-    const stats = await wkAll(`/review_statistics?updated_after=${midnight.toISOString()}`);
-    doneToday = stats.length;
+    const stats = await wk(`/review_statistics?updated_after=${midnight.toISOString()}`);
+    doneToday = stats.total_count ?? stats.data.length;
   } catch {
     /* keep previous value */
   }
@@ -93,43 +93,6 @@ export async function syncWaniKani({ force = false } = {}) {
   if (doneToday > 0 && (dayLog().wk || 0) < doneToday) setActivity('wk', doneToday);
   else save();
   return snap;
-}
-
-// Bunpro has no stable public API. The legacy "study_queue" endpoint keyed by the
-// settings API key is tried; if Bunpro or the browser (CORS) refuses, we fall
-// back to manual logging and say so in the UI.
-export async function syncBunpro({ force = false } = {}) {
-  const key = state.settings.bunproKey.trim();
-  if (!key) return null;
-  const prev = state.cache.bunpro;
-  if (!force && prev && fresh(prev, 5 * 60 * 1000)) return prev;
-  try {
-    const res = await fetch(`https://bunpro.jp/api/user/${encodeURIComponent(key)}/study_queue`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    const info = json.requested_information || {};
-    const user = json.user_information || {};
-    if (info.reviews_available === undefined) throw new Error('Unexpected response');
-    const snap = {
-      ok: true,
-      fetchedAt: Date.now(),
-      username: user.username,
-      grammarPoints: user.grammar_point_count,
-      ghosts: user.ghost_review_count,
-      reviews: info.reviews_available,
-      nextHour: info.reviews_available_next_hour,
-      nextDay: info.reviews_available_next_day,
-      nextReviewAt: info.next_review_date ? Number(info.next_review_date) * 1000 : null,
-    };
-    state.cache.bunpro = snap;
-    save();
-    return snap;
-  } catch (e) {
-    const snap = { ok: false, fetchedAt: Date.now(), error: e.message || 'Unreachable' };
-    state.cache.bunpro = snap;
-    save();
-    return snap;
-  }
 }
 
 export async function loadNews() {

@@ -15,12 +15,26 @@ No build step, no server: plain HTML/CSS/JS modules. Your data stays in the brow
 | Source | How |
 | --- | --- |
 | WaniKani | Official API v2 with a personal access token (read-only is enough). Shows level, lessons, reviews, 24h forecast, SRS spread and items reviewed today, and fills in your WaniKani goal automatically. |
-| Bunpro | No stable public API. The legacy `study_queue` endpoint is tried with your settings API key; if Bunpro or the browser refuses it, you tick Bunpro by hand. |
+| Bunpro | No public API: tick your Bunpro reviews by hand (one tap on Today). |
 | Conjugation | Link to the Japan Foundation Sydney conjugation practice. |
 | Natively / WaniKani book clubs | Links. Neither has a public API. |
 | NHK news | NHK doesn't allow browsers to read its feeds directly (no CORS). A GitHub Action (`.github/workflows/news.yml`) fetches the headlines every 3 hours into `data/news.json`. |
 
+## Home screen widget (Scriptable)
+
+iOS only lets native apps add widgets, so the widget runs in the free [Scriptable](https://apps.apple.com/app/scriptable/id1405459188) app (`widget/benkyo-widget.js`). It works in small, medium and **large** sizes; large shows everything: streak, WaniKani level/lessons/reviews, 24h forecast, daily goals, textbook chapter and pace, current book, 30-day bloom strip and the proverb.
+
+1. Install Scriptable.
+2. In 勉強 tap ⚙︎ → **Copy widget script**. In Scriptable tap ＋, paste, and name the script **Benkyo Widget**.
+3. Back in 勉強 tap **Update widget 🌸**. This opens Scriptable with your progress and WaniKani token. The token is kept in the iOS Keychain.
+4. Long-press the home screen → ＋ → Scriptable → **Large** → add it, long-press it → *Edit Widget* → Script: **Benkyo Widget**.
+
+WaniKani numbers refresh live on their own (iOS refreshes widgets roughly every 15–30 min). Goals, streak and book progress update each time you tap **Update widget** (also on the Today tab). Tapping the WaniKani tiles opens WaniKani.
+
 ## Put it online (GitHub Pages)
+
+> GitHub Pages on a **private** repository needs a paid GitHub plan (Pro). On a free account, either make the repository public (no secrets are stored in it: your token and progress stay on the phone) or deploy the folder for free with Cloudflare Pages or Netlify.
+
 
 1. Merge this into `main`.
 2. In the repo, open **Settings → Pages**, set *Source* to **Deploy from a branch**, branch `main`, folder `/ (root)`.

@@ -16,7 +16,6 @@ const defaults = () => ({
   version: 1,
   settings: {
     wkToken: '',
-    bunproKey: '',
     name: '',
     goals: { wk: true, bunpro: true, textbook: true, conj: true, reading: true, news: false },
     targets: {}, // bookId -> { start: 'YYYY-MM-DD', end: 'YYYY-MM-DD' }
@@ -27,7 +26,8 @@ const defaults = () => ({
   reading: [], // { id, title, url, pages, current, status, started, finished }
   newsRead: {}, // url -> 'YYYY-MM-DD'
   badges: {}, // badgeId -> 'YYYY-MM-DD'
-  cache: {}, // wk / bunpro API snapshots
+  cache: {}, // WaniKani API snapshot
+  widgetSyncedAt: null,
 });
 
 function merge(base, extra) {

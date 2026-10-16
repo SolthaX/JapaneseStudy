@@ -3,7 +3,7 @@ import {
   state, save, onChange, ACTIVITIES, activeGoals, dayLog, setActivity, today, dayKey, parseDay, addDays,
   dayScore, streak, bestStreak, studyDaysInLast, exportData, importData,
 } from './store.js';
-import { syncWaniKani, syncBunpro, loadNews, SRS_GROUPS } from './api.js';
+import { syncWaniKani, loadNews, SRS_GROUPS } from './api.js';
 import {
   bookProgress, nextChapter, currentBook, peekChapter, chapterProgress, toggleStep, toggleGrammar,
   setChapterComplete, setBookComplete, pacing, setTarget, BADGES, checkBadges,
@@ -121,7 +121,7 @@ let newsTab = 'easy';
 let news = null;
 let newsError = null;
 const openChapters = new Set();
-const busy = { wk: false, bunpro: false };
+const busy = { wk: false };
 const errors = {};
 
 function greeting() {
@@ -144,14 +144,12 @@ function ring(done, total) {
 function goalDetail(a) {
   const log = dayLog();
   const wk = state.cache.wk;
-  const bp = state.cache.bunpro;
   switch (a.id) {
     case 'wk':
       if (!state.settings.wkToken) return 'Add your API token in settings for auto-tracking';
       if (!wk) return 'Syncing…';
       return `${log.wk && log.wk !== true ? `${log.wk} reviewed today · ` : ''}${wk.reviews} reviews · ${wk.lessons} lessons waiting`;
     case 'bunpro':
-      if (bp?.ok) return `${bp.reviews} reviews waiting`;
       return 'Tick when your Bunpro reviews are done';
     case 'textbook': {
       const b = currentBook();
@@ -217,11 +215,16 @@ function viewToday() {
     ${section('ワニカニ', 'WaniKani', state.settings.wkToken ? `<button class="btn small ghost" data-action="sync-wk">${busy.wk ? '…' : '↻ Sync'}</button>` : '')}
     ${wkCard()}
 
-    ${section('文プロ', 'Bunpro', state.settings.bunproKey ? `<button class="btn small ghost" data-action="sync-bunpro">${busy.bunpro ? '…' : '↻ Sync'}</button>` : '')}
+    ${section('文プロ', 'Bunpro')}
     ${bunproCard()}
 
     ${section('教科書', 'Textbook')}
     ${textbookCard(currentBook().id, true)}
+
+    ${section('ウィジェット', 'Widget')}
+    <div class="card"><div class="row between">
+      <div class="grow"><h3>Home screen widget</h3><div class="sub">${state.widgetSyncedAt ? `Updated ${new Date(state.widgetSyncedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}${dayKey(new Date(state.widgetSyncedAt)) === today() ? '' : ` · ${shortDate(dayKey(new Date(state.widgetSyncedAt)))}`}` : 'Set it up in ⚙︎ Settings'}</div></div>
+      <button class="btn primary small" data-action="update-widget">Update 🌸</button></div></div>
 
     ${section('今日のことわざ', 'Proverb of the day')}
     <div class="card proverb"><div class="jp">${pjp}</div><div class="muted small">${pkana}</div><div style="margin-top:6px">${pen}</div></div>
@@ -260,25 +263,14 @@ function wkCard() {
 }
 
 function bunproCard() {
-  const bp = state.cache.bunpro;
   const done = dayLog().bunpro;
-  const tick = `<button class="btn ${done ? '' : 'primary'}" data-action="toggle-goal" data-id="bunpro">${done ? '✓ Done today' : 'Mark reviews done'}</button>`;
-  const open = `<a class="btn ghost" href="https://bunpro.jp/dashboard" target="_blank" rel="noopener">Open ↗</a>`;
-  if (bp?.ok) {
-    return `<div class="card">
-      <div class="row between"><div><h3>${esc(bp.username || 'Bunpro')}</h3><div class="sub">${bp.grammarPoints ?? '—'} grammar points studied</div></div>${open}</div>
-      <div class="stats">
-        <div class="stat"><b style="color:var(--sakura-deep)">${bp.reviews}</b><span>Reviews 復習</span></div>
-        <div class="stat"><b>${bp.nextHour ?? '—'}</b><span>Next hour</span></div>
-        <div class="stat"><b>${bp.nextDay ?? '—'}</b><span>Next 24h</span></div>
-      </div>
-      ${bp.ghosts ? `<div class="sub" style="margin-top:8px">👻 ${bp.ghosts} ghost reviews</div>` : ''}
-      <div class="row" style="margin-top:12px">${tick}</div></div>`;
-  }
-  const note = !state.settings.bunproKey
-    ? 'Bunpro has no stable public API. Add your API key in settings to try auto-sync, or simply log your reviews here.'
-    : `Auto-sync unavailable (${esc(bp?.error || 'not tried yet')}). Bunpro's legacy API may be disabled or blocked by the browser — manual logging still counts toward your streak.`;
-  return `<div class="card"><p class="sub" style="margin-top:0">${note}</p><div class="row">${tick}${open}</div></div>`;
+  return `<div class="card"><div class="row between">
+    <div class="grow"><h3>${done ? 'お疲れ様！' : 'Grammar reviews 文法の復習'}</h3>
+    <div class="sub">Bunpro has no API — tick it once your reviews are done.</div></div></div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn ${done ? '' : 'primary'}" data-action="toggle-goal" data-id="bunpro">${done ? '✓ Done today' : 'Mark reviews done'}</button>
+      <a class="btn ghost" href="https://bunpro.jp/dashboard" target="_blank" rel="noopener">Open Bunpro ↗</a>
+    </div></div>`;
 }
 
 function paceHTML(bookId) {
@@ -558,11 +550,19 @@ function openSettings() {
       <small>Create one at <a href="https://www.wanikani.com/settings/personal_access_tokens" target="_blank" rel="noopener">wanikani.com → Settings → API tokens</a> (default read-only permissions are enough). Stored only on this device.</small></label>
     <button class="btn small" data-action="sync-wk">Test connection</button>
 
-    <h3 style="margin:18px 0 0">文プロ Bunpro</h3>
-    <label class="field"><span>API key (experimental)</span>
-      <input class="input" type="password" autocomplete="off" data-setting="bunproKey" value="${esc(s.bunproKey)}" placeholder="From Bunpro → Settings">
-      <small>Bunpro has no stable public API; the legacy key endpoint is tried and, if refused, you log Bunpro by hand.</small></label>
-    <button class="btn small" data-action="sync-bunpro">Test connection</button>
+    <h3 style="margin:18px 0 0">ウィジェット Home screen widget</h3>
+    <p class="sub">Uses the free <a href="https://apps.apple.com/app/scriptable/id1405459188" target="_blank" rel="noopener">Scriptable</a> app (small, medium or large widget).</p>
+    <ol class="sub" style="padding-left:18px;margin:6px 0">
+      <li>Install Scriptable, then tap <b>Copy widget script</b>.</li>
+      <li>In Scriptable tap ＋, paste, and name the script <b>${WIDGET_SCRIPT}</b>.</li>
+      <li>Back here tap <b>Update widget</b> (sends your progress and WaniKani token).</li>
+      <li>Long-press the home screen → ＋ → Scriptable → <b>Large</b> → edit it and pick <b>${WIDGET_SCRIPT}</b>.</li>
+    </ol>
+    <div class="row" style="flex-wrap:wrap;gap:8px">
+      <button class="btn" data-action="copy-widget">Copy widget script</button>
+      <button class="btn primary" data-action="update-widget">Update widget 🌸</button>
+    </div>
+    <p class="sub small">${state.widgetSyncedAt ? `Last update ${new Date(state.widgetSyncedAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : 'Not sent yet.'}</p>
 
     <h3 style="margin:18px 0 4px">今日の目標 Daily goals</h3>
     ${ACTIVITIES.map((a) => `<div class="switch-row"><span>${a.icon} ${a.en} <span class="muted small">${a.ja}</span></span>
@@ -610,6 +610,62 @@ async function exportBackup() {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
+// ---------- widget (Scriptable) ----------
+
+const WIDGET_SCRIPT = 'Benkyo Widget';
+
+function widgetPayload() {
+  const t = today();
+  const heat = [];
+  for (let i = 29; i >= 0; i--) heat.push(Math.min(4, dayScore(dayKey(addDays(new Date(), -i)))));
+  const log = dayLog();
+  const b = currentBook();
+  const prog = bookProgress(b.id);
+  const ch = nextChapter(b.id);
+  const p = pacing(b.id);
+  let pace = null;
+  if (p && !p.finished) {
+    if (Math.abs(p.delta) < 0.25) pace = { label: 'On track 順調', kind: 'on' };
+    else if (p.delta > 0) pace = { label: `+${fmt1(p.delta)} ch. 先行`, kind: 'ahead' };
+    else pace = { label: `−${fmt1(-p.delta)} ch. 遅れ`, kind: 'behind' };
+  }
+  const r = state.reading.find((x) => x.status === 'reading');
+  const [pja, , pen] = proverbOfDay();
+  return {
+    benkyo: 1,
+    day: t,
+    streak: streak(),
+    studiedToday: dayScore(t) > 0,
+    heat,
+    goals: activeGoals().map((a) => ({ id: a.id, icon: a.icon, ja: a.ja, done: !!log[a.id] })),
+    book: { title: b.title, next: ch ? `第${ch.n}課 ${ch.ja}` : null, ratio: prog.ratio, done: Math.floor(prog.done), total: prog.total, pace },
+    reading: r ? { title: r.title, current: r.current || 0, pages: r.pages || 0 } : null,
+    proverb: { ja: pja, en: pen },
+    appUrl: location.href.split('#')[0],
+    token: state.settings.wkToken || '',
+  };
+}
+
+function updateWidget() {
+  const json = JSON.stringify(widgetPayload());
+  // Clipboard copy is a fallback: the script also reads it when run by hand.
+  navigator.clipboard?.writeText(json).catch(() => {});
+  state.widgetSyncedAt = Date.now();
+  save();
+  location.href = `scriptable:///run/${encodeURIComponent(WIDGET_SCRIPT)}?payload=${encodeURIComponent(json)}`;
+}
+
+async function copyWidgetScript() {
+  const src = fetch('widget/benkyo-widget.js').then((r) => r.text());
+  try {
+    // Safari only allows clipboard writes inside the tap, so hand it a pending blob.
+    await navigator.clipboard.write([new ClipboardItem({ 'text/plain': src.then((t) => new Blob([t], { type: 'text/plain' })) })]);
+  } catch {
+    await navigator.clipboard.writeText(await src);
+  }
+  toast('Widget script copied — paste it into Scriptable');
+}
+
 // ---------- sync ----------
 
 async function runSync(kind, force) {
@@ -621,9 +677,6 @@ async function runSync(kind, force) {
       await syncWaniKani({ force });
       delete errors.wk;
       if (force) toast('WaniKani synced ✓');
-    } else {
-      const r = await syncBunpro({ force });
-      if (force) toast(r?.ok ? 'Bunpro synced ✓' : 'Bunpro API unavailable — log manually');
     }
   } catch (e) {
     errors[kind] = e.message;
@@ -655,7 +708,8 @@ document.addEventListener('click', (e) => {
       return;
     }
     case 'sync-wk': return runSync('wk', true);
-    case 'sync-bunpro': return runSync('bunpro', true);
+    case 'update-widget': return updateWidget();
+    case 'copy-widget': return copyWidgetScript();
     case 'pick-book': selectedBook = el.dataset.book; return render();
     case 'step': return toggleStep(el.dataset.book, n, el.dataset.step);
     case 'grammar': return toggleGrammar(el.dataset.book, n, Number(el.dataset.i));
@@ -724,7 +778,6 @@ document.addEventListener('change', (e) => {
     save();
     if (el.dataset.setting === 'theme') applyTheme();
     if (el.dataset.setting === 'wkToken') { delete state.cache.wk; save(); }
-    if (el.dataset.setting === 'bunproKey') { delete state.cache.bunpro; save(); }
     return;
   }
   if (el.dataset.goal) {
@@ -822,7 +875,6 @@ window.addEventListener('hashchange', () => setTab((location.hash || '#today').s
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
     runSync('wk', false);
-    runSync('bunpro', false);
     render();
   }
 });
@@ -833,7 +885,6 @@ applyTheme();
 render();
 checkBadges();
 runSync('wk', false);
-runSync('bunpro', false);
 
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});
