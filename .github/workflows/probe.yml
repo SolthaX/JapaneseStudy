@@ -6,18 +6,8 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Resources list
+      - name: WaniKani new dashboard announcement
         run: |
-          curl -sSL -m 30 -A "Mozilla/5.0" -o raw.md "https://community.wanikani.com/raw/16859/1"
-          wc -c raw.md
-          python3 - <<'PY'
-          import re
-          s = open('raw.md', encoding='utf-8', errors='ignore').read()
-          for line in s.splitlines():
-              l = line.strip()
-              if re.match(r'^#{1,4}\s', l) or l.startswith('[details'):
-                  print('HEAD', re.sub(r'\[details="?([^"\]]*)"?\]', r'\1', l)[:90])
-              elif l.startswith(('*', '-', '|')) and '](' in l:
-                  names = re.findall(r'\[([^\]]{2,60})\]\(', l)
-                  if names: print('  -', ' / '.join(names[:3])[:110])
-          PY
+          curl -sSL -m 30 -A "Mozilla/5.0" "https://community.wanikani.com/raw/71904/1" | head -c 9000
+          echo; echo "===== staff replies mentioning customize ====="
+          for n in 2 3 4 5 6 7 8; do curl -sSL -m 20 -A "Mozilla/5.0" "https://community.wanikani.com/raw/71904/$n" | head -c 900; echo; echo "-----"; done
