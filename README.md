@@ -85,6 +85,11 @@ Then tap ⚙︎ and paste your WaniKani token from <https://www.wanikani.com/set
 
 > Note: iOS keeps home-screen apps' storage separate from Safari. Set things up from the home-screen app itself, and export a backup from there.
 
+## Project handoff & planning (French)
+
+- [`docs/reprise/`](docs/reprise/00-LIRE-EN-PREMIER.md) — handoff notes to resume the project in a new Claude chat (state, decisions, design plan, companions, business, roadmap) plus a ready-to-paste prompt.
+- [`docs/maquettes/`](docs/maquettes/README.md) — planning mockups (themes, customizable dashboard, pixel-art companions and garden) and the scripts that generated them.
+
 ## Development
 
 ```sh

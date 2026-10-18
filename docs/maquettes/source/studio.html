@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Benkyō companions studio</title>
+<style>
+  body { margin:0; font-family:-apple-system,"Segoe UI","Hiragino Sans",system-ui,sans-serif; color:#2a2438; background:#f4efe6; }
+  .board { padding:28px 34px; }
+  h1 { margin:0 0 4px; font-size:28px; } h1 small { font-weight:500; color:#8a7f8d; font-size:16px; }
+  .sub { color:#6b6270; margin-bottom:18px; }
+  .grid5 { display:grid; grid-template-columns:repeat(5,1fr); gap:18px; }
+  .card { background:#fffdf9; border-radius:20px; padding:12px 12px 14px; box-shadow:0 2px 0 #e8dfd2; text-align:center; position:relative; }
+  .card svg { width:100%; height:auto; display:block; }
+  .card b { display:block; font-size:16px; } .card .ja { color:#8a7f8d; font-size:13px; }
+  .unlock { margin-top:8px; display:inline-block; font-size:11.5px; background:#fde4ea; color:#b0345f; border-radius:999px; padding:3px 10px; font-weight:600; }
+  .num { position:absolute; top:10px; left:12px; font-size:11px; color:#b8aebb; font-weight:700; }
+  .row { display:flex; gap:16px; align-items:flex-end; }
+  .panel { background:#fffdf9; border-radius:18px; padding:12px; box-shadow:0 2px 0 #e8dfd2; }
+  .panel h3 { margin:2px 4px 8px; font-size:14px; color:#6b6270; text-transform:uppercase; letter-spacing:.05em; }
+  .lbl { text-align:center; font-size:12px; color:#6b6270; margin-top:-2px; }
+  .sw { display:flex; gap:10px; } .sw div { text-align:center; font-size:11px; color:#6b6270; } .sw i { display:block; width:46px; height:46px; border-radius:12px; margin-bottom:4px; border:1px solid #e8dfd2; }
+  .notes { font-size:13px; line-height:1.5; color:#4a4250; } .notes li { margin-bottom:3px; }
+  .styles { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .styles .panel { padding:10px; } .styles canvas, .styles svg { width:100%; display:block; border-radius:12px; image-rendering:pixelated; }
+  .styles .cap { margin:10px 6px 4px; } .styles .cap b { font-size:17px; } .styles .cap div { color:#6b6270; font-size:13px; }
+</style></head>
+<body><div id="root"></div>
+<script type="module">
+import { CAST, companion, blossomTree, lantern, torii, pond, house } from './chars.js';
+const q = new URLSearchParams(location.search);
+const board = q.get('board') || 'lineup';
+const root = document.getElementById('root');
+const svg = (w, h, inner, extra = '') => `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" ${extra}>${inner}</svg>`;
+
+function scene(style, { season = 'spring', items = 5, t = 0, char = 'shiba', expr = 'happy' } = {}) {
+  const sky = { spring: '#fdeef2', summer: '#e8f4fb', autumn: '#fbeee2', winter: '#eef2f7' }[season];
+  const ground = { spring: '#cfe3b4', summer: '#b8d99a', autumn: '#e3cf9e', winter: '#f5f7fa' }[season];
+  const bloom = { spring: ['#f4a7b9', '#e0457b'], summer: ['#9fd08a', '#5c9a4a'], autumn: ['#e8743b', '#b8401c'], winter: ['#ffffff', '#c8d8ea'] }[season];
+  let s = `${style === 'ukiyo' ? '' : `<rect width="480" height="360" fill="${sky}"/>`}<ellipse cx="240" cy="372" rx="320" ry="90" fill="${style === 'ukiyo' ? '#c9c79a' : ground}"/>`;
+  if (items >= 4) s += torii(392, 196, 0.9, style);
+  if (items >= 3) s += pond(330, 312, 1);
+  if (items >= 5) s += house(92, 214, 0.9);
+  s += blossomTree(150, 104, 1.45, { color: bloom[0], center: bloom[1], style, blooms: items >= 1 ? 14 : 0 });
+  if (items >= 2) s += lantern(70, 236, 0.9, style);
+  if (season === 'winter') for (let i = 0; i < 40; i++) s += `<circle cx="${(i * 97) % 480}" cy="${((i * 53) % 300) + t * 40}" r="${2 + (i % 3)}" fill="#fff" opacity=".9"/>`;
+  if (season === 'summer') for (let i = 0; i < 10; i++) s += `<circle cx="${(i * 131) % 480}" cy="${200 + ((i * 41) % 90)}" r="3" fill="#fff59a" opacity="${0.4 + 0.5 * Math.abs(Math.sin(t * 6 + i))}"/>`;
+  s += companion(char, { x: 186, y: 186, scale: 0.78, expr, style, bob: Math.sin(t * Math.PI * 2) * 2, tailWag: Math.sin(t * Math.PI * 4) * 14 });
+  return s;
+}
+
+function ukiyoWrap(inner) {
+  return `<defs><filter id="paper" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="3"/><feColorMatrix type="matrix" values="0 0 0 0 .42  0 0 0 0 .3  0 0 0 0 .16  0 0 0 -1.4 .62"/></filter>
+    <filter id="mute"><feColorMatrix type="matrix" values=".92 .08 0 0 0  .04 .88 .06 0 0  .02 .1 .78 0 0  0 0 0 1 0"/></filter>
+    <pattern id="wave" width="40" height="20" patternUnits="userSpaceOnUse"><rect width="40" height="20" fill="#2f4b7a"/>${[16, 11, 6].map((r) => `<circle cx="20" cy="20" r="${r}" fill="none" stroke="#e9e1cf" stroke-width="2"/><circle cx="0" cy="20" r="${r}" fill="none" stroke="#e9e1cf" stroke-width="2"/><circle cx="40" cy="20" r="${r}" fill="none" stroke="#e9e1cf" stroke-width="2"/>`).join('')}</pattern></defs>
+    <g filter="url(#mute)"><rect width="480" height="360" fill="#efe3c8"/><circle cx="380" cy="80" r="42" fill="#c8402e"/><path d="M0 70 q60 -20 120 0 t120 0 t120 0 t120 0 v14 h-480z" fill="#e7d6b0"/>${inner}<rect y="330" width="480" height="30" fill="url(#wave)"/></g>
+    <rect width="480" height="360" fill="#fff" filter="url(#paper)" opacity=".5"/><rect x="430" y="14" width="34" height="60" fill="#c8402e"/><text x="447" y="38" font-size="16" fill="#fff" text-anchor="middle" font-family="serif">勉</text><text x="447" y="60" font-size="16" fill="#fff" text-anchor="middle" font-family="serif">強</text>`;
+}
+
+async function toPixel(svgText, w, h, px) {
+  const img = new Image();
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText);
+  await img.decode();
+  const ph = Math.round(px * h / w);
+  const small = document.createElement('canvas'); small.width = px; small.height = ph;
+  const sx = small.getContext('2d'); sx.imageSmoothingEnabled = false; sx.drawImage(img, 0, 0, px, ph);
+  // posterize colours for a limited palette look
+  const d = sx.getImageData(0, 0, px, ph);
+  for (let i = 0; i < d.data.length; i += 4) for (let k = 0; k < 3; k++) d.data[i + k] = Math.min(255, Math.round(d.data[i + k] / 16) * 16);
+  sx.putImageData(d, 0, 0);
+  const big = document.createElement('canvas'); big.width = w * 2; big.height = h * 2;
+  const bx = big.getContext('2d'); bx.imageSmoothingEnabled = false; bx.drawImage(small, 0, 0, w * 2, h * 2);
+  return big;
+}
+
+// ---------- pixel art with black outlines ----------
+const OUTLINE = [27, 21, 32];
+async function rasterize(markup, w, h, pw) {
+  const img = new Image();
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">${markup}</svg>`);
+  await img.decode();
+  const ph = Math.round(pw * h / w);
+  const c = document.createElement('canvas'); c.width = pw; c.height = ph;
+  const x = c.getContext('2d'); x.imageSmoothingEnabled = true; x.drawImage(img, 0, 0, pw, ph);
+  return c;
+}
+// Limited palette: every pixel snaps to the nearest colour actually used in the drawing
+// (plus outline black and white), so eyes, blush and markings stay crisp.
+function paletteOf(markup) {
+  const cols = new Set((markup.match(/#[0-9a-fA-F]{6}\b/g) || []).map((h) => h.toLowerCase()));
+  cols.add('#ffffff'); cols.add('#1b1520');
+  return [...cols].map((h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)));
+}
+function crisp(c, { outline = true, step = 20, palette = null } = {}) {
+  const x = c.getContext('2d'); const d = x.getImageData(0, 0, c.width, c.height); const a = d.data;
+  const W = c.width, H = c.height;
+  for (let i = 0; i < a.length; i += 4) {
+    a[i + 3] = a[i + 3] > 110 ? 255 : 0;
+    if (!palette) for (let k = 0; k < 3; k++) a[i + k] = Math.min(255, Math.round(a[i + k] / step) * step);
+  }
+  if (palette) {
+    // Nearest palette colour; pixels that are blends of two areas take the most common
+    // clean colour among their neighbours instead (avoids stray off-colour pixels).
+    const idx = new Int16Array(W * H).fill(-1); const far = new Uint8Array(W * H);
+    for (let n = 0; n < W * H; n++) {
+      const i = n * 4; if (!a[i + 3]) continue;
+      let best = 0, bd = Infinity;
+      palette.forEach((p, j) => { const dd = (p[0] - a[i]) ** 2 + (p[1] - a[i + 1]) ** 2 + (p[2] - a[i + 2]) ** 2; if (dd < bd) { bd = dd; best = j; } });
+      idx[n] = best; far[n] = bd > 1600 ? 1 : 0;
+    }
+    for (let n = 0; n < W * H; n++) {
+      if (idx[n] < 0) continue;
+      let pick = idx[n];
+      if (far[n]) {
+        const count = {}; const px = n % W, py = (n / W) | 0;
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+          const m = (py + dy) * W + px + dx; if (m < 0 || m >= W * H || idx[m] < 0 || far[m]) continue;
+          count[idx[m]] = (count[idx[m]] || 0) + 1;
+        }
+        const ks = Object.keys(count); if (ks.length) pick = Number(ks.sort((u, v) => count[v] - count[u])[0]);
+      }
+      const i = n * 4; [a[i], a[i + 1], a[i + 2]] = palette[pick];
+    }
+  }
+  if (outline) {
+    const solid = (px, py) => px >= 0 && py >= 0 && px < W && py < H && a[(py * W + px) * 4 + 3] === 255;
+    const edge = [];
+    for (let py = 0; py < H; py++) for (let px = 0; px < W; px++) {
+      if (!solid(px, py)) continue;
+      if (!solid(px - 1, py) || !solid(px + 1, py) || !solid(px, py - 1) || !solid(px, py + 1)) edge.push((py * W + px) * 4);
+    }
+    for (const i of edge) { a[i] = OUTLINE[0]; a[i + 1] = OUTLINE[1]; a[i + 2] = OUTLINE[2]; }
+  }
+  x.putImageData(d, 0, 0);
+  return c;
+}
+function upscale(c, k) {
+  const b = document.createElement('canvas'); b.width = c.width * k; b.height = c.height * k;
+  const x = b.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(c, 0, 0, b.width, b.height);
+  return b;
+}
+async function sprite(markup, { w = 200, h = 200, px = 56, k = 4, outline = true } = {}) {
+  return upscale(crisp(await rasterize(markup, w, h, px), { outline, palette: paletteOf(markup) }), k);
+}
+async function pixelScene({ season = 'spring', items = 5, char = 'shiba', expr = 'happy', t = 0, px = 160 } = {}) {
+  const sky = { spring: '#fde9ef', summer: '#e3f2fb', autumn: '#fbeadc', winter: '#e9eff7' }[season];
+  const ground = { spring: '#bfe0a2', summer: '#a9d68b', autumn: '#e0c98f', winter: '#f4f7fb' }[season];
+  const bloom = { spring: ['#f4a7b9', '#e0457b'], summer: ['#9fd08a', '#5c9a4a'], autumn: ['#e8743b', '#b8401c'], winter: ['#ffffff', '#c8d8ea'] }[season];
+  const W = 480, H = 360, k = W * 2 / px;
+  const out = document.createElement('canvas'); out.width = W * 2; out.height = H * 2;
+  const o = out.getContext('2d'); o.imageSmoothingEnabled = false;
+  const layer = async (m, outline) => o.drawImage(upscale(crisp(await rasterize(m, W, H, px), { outline, palette: paletteOf(m) }), k), 0, 0);
+  await layer(`<rect width="480" height="360" fill="${sky}"/><ellipse cx="240" cy="372" rx="320" ry="90" fill="${ground}"/>`, false);
+  if (items >= 5) await layer(house(92, 214, 0.9), true);
+  if (items >= 4) await layer(torii(392, 196, 0.9), true);
+  if (items >= 3) await layer(pond(410, 326, 0.9), true);
+  const crown = { spring: '#fbd3de', summer: '#cde8b8', autumn: '#f6c08f', winter: '#eef4fb' }[season];
+  await layer(blossomTree(150, 104, 1.45, { color: bloom[0], center: bloom[1], blooms: items >= 1 ? 14 : 0, canopy: crown }), true);
+  if (items >= 2) await layer(lantern(70, 236, 0.9), true);
+  await layer(companion(char, { x: 250, y: 196, scale: 0.74, expr, cute: true, bob: Math.round(Math.sin(t * Math.PI * 2) * 3), tailWag: Math.sin(t * Math.PI * 4) * 16 }), true);
+  if (season === 'winter') for (let i = 0; i < 30; i++) { o.fillStyle = '#fff'; o.fillRect(Math.round(((i * 97) % 480) * 2 / k) * k, Math.round((((i * 53) % 300) + t * 40) * 2 / k) * k, k, k); }
+  return out;
+}
+
+const boards = {
+  lineup() {
+    const ids = Object.keys(CAST);
+    root.innerHTML = `<div class="board"><h1>Companions <small>· the cast (unlockable)</small></h1><div class="sub">Same chibi family: big head, round body, blush, tiny paws. Locked companions show as a silhouette with their unlock goal.</div>
+      <div class="grid5">${ids.map((id, i) => `<div class="card"><span class="num">${String(i + 1).padStart(2, '0')}</span>${svg(200, 200, companion(id, { expr: i % 3 === 1 ? 'happy' : 'neutral' }))}<b>${CAST[id].name}</b><span class="ja">${CAST[id].ja}</span><br><span class="unlock">🔓 ${CAST[id].unlock}</span></div>`).join('')}</div></div>`;
+  },
+  sheet() {
+    const id = q.get('char') || 'shiba';
+    const c = CAST[id];
+    const views = ['front', 'side', 'back'];
+    const exprs = ['neutral', 'happy', 'sleepy', 'surprised', 'wink'];
+    const cols = [[c.body, 'Body'], [c.belly, 'Belly / muzzle'], [c.inner, 'Ears'], ['#ff8fa3', 'Blush'], ['#d63a3a', 'Scarf'], ['#2a2220', 'Eyes']];
+    root.innerHTML = `<div class="board"><h1>${c.name} ${c.ja} <small>· model sheet</small></h1><div class="sub">Reference for drawing and animating — proportions, turnaround, expressions, colours.</div>
+      <div class="row" style="align-items:stretch">
+        <div class="panel" style="flex:1.4"><h3>Turnaround</h3><div class="row">${views.map((v) => `<div style="flex:1">${svg(200, 200, companion(id, { view: v }))}<div class="lbl">${v}</div></div>`).join('')}</div></div>
+        <div class="panel" style="flex:1"><h3>Proportions</h3>${svg(300, 200, `<line x1="0" y1="186" x2="300" y2="186" stroke="#d8cfc2"/>${[44, 124].map((y) => `<line x1="0" y1="${y}" x2="300" y2="${y}" stroke="#e8dfd2" stroke-dasharray="4 4"/>`).join('')}${companion(id, { x: 20, scale: 1 })}${lantern(250, 96, 1.05)}<text x="214" y="88" font-size="11" fill="#8a7f8d">stone lantern</text><text x="150" y="38" font-size="11" fill="#8a7f8d">← head ≈ ½ height</text>`)}</div>
+      </div>
+      <div class="panel" style="margin-top:16px"><h3>Expressions</h3><div class="row">${exprs.map((e) => `<div style="flex:1">${svg(200, 200, companion(id, { expr: e }))}<div class="lbl">${e}</div></div>`).join('')}</div></div>
+      <div class="row" style="margin-top:16px;align-items:stretch">
+        <div class="panel" style="flex:1"><h3>Palette</h3><div class="sw">${cols.map(([h, n]) => `<div><i style="background:${h}"></i>${n}<br>${h}</div>`).join('')}</div></div>
+        <div class="panel notes" style="flex:1.3"><h3>Animation notes</h3><ul style="margin:0;padding-left:18px">
+          <li><b>Idle</b>: breathe (2 px bob, 2 s), blink every 3–5 s, tail wag ±14°.</li>
+          <li><b>Peek</b>: slides 60 % out from a card edge, looks left/right, ducks back (1.2 s).</li>
+          <li><b>Celebrate</b>: hop + happy face when a goal is ticked.</li>
+          <li><b>Sleepy</b>: after 22:00 or on a rest day, with “z z”.</li>
+          <li>Never covers text or buttons; tap it and it runs away.</li></ul></div>
+      </div></div>`;
+  },
+  async styles() {
+    const flat = svg(480, 360, scene('flat'));
+    const uk = svg(480, 360, ukiyoWrap(scene('ukiyo')));
+    root.innerHTML = `<div class="board"><h1>Three art styles <small>· same scene, same shiba</small></h1><div class="sub">Pick one direction for companions and the garden.</div>
+      <div class="styles">
+        <div class="panel">${flat}<div class="cap"><b>A · Soft flat illustration</b><div>Matches the current blossom tree; crisp at any size, light to animate (SVG).</div></div></div>
+        <div class="panel"><div id="px"></div><div class="cap"><b>B · Pixel art</b><div>Cosy retro game feel; tiny sprites, frame-by-frame animation is cheap.</div></div></div>
+        <div class="panel">${uk}<div class="cap"><b>C · Ukiyo-e print</b><div>Ink outlines, washi paper, Edo palette, wave border; most “Japanese”, heavier detail.</div></div></div>
+      </div></div>`;
+    const cv = await toPixel(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" width="480" height="360">${scene('flat')}</svg>`, 480, 360, 120);
+    document.getElementById('px').appendChild(cv);
+  },
+  async pixellineup() {
+    const ids = Object.keys(CAST);
+    root.innerHTML = `<div class="board"><h1>Companions · pixel art <small>· cuter &amp; rounder, black outlines</small></h1><div class="sub">Big head, tiny body, sparkly eyes. Sprites are 56 px wide, shown ×4.</div>
+      <div class="grid5">${ids.map((id, i) => `<div class="card"><span class="num">${String(i + 1).padStart(2, '0')}</span><div class="spr" data-id="${id}" data-i="${i}"></div><b>${CAST[id].name}</b><span class="ja">${CAST[id].ja}</span><br><span class="unlock">🔓 ${CAST[id].unlock}</span></div>`).join('')}</div></div>`;
+    for (const el of document.querySelectorAll('.spr')) {
+      const cv = await sprite(companion(el.dataset.id, { cute: true, expr: Number(el.dataset.i) % 3 === 1 ? 'happy' : 'neutral' }));
+      cv.style.width = '100%'; cv.style.imageRendering = 'pixelated'; el.appendChild(cv);
+    }
+  },
+  async starter() {
+    const ids = ['shiba', 'neko', 'tanuki'];
+    const blurb = { shiba: 'Loyal and cheerful. Wags when you finish a goal.', neko: 'Brings luck. Waves its paw at your streak.', tanuki: 'Playful trickster. Hides behind your widgets.' };
+    root.innerHTML = `<div class="board" style="background:#fbf5f2;min-height:640px"><div style="text-align:center"><h1 style="font-size:26px">Choose your companion</h1><div class="sub">You can unlock the others by studying. 🌸</div></div>
+      <div class="grid5" style="grid-template-columns:repeat(3,260px);justify-content:center">${ids.map((id, i) => `<div class="card" style="${i === 0 ? 'outline:4px solid #e0457b' : ''}"><div class="spr" data-id="${id}"></div><b>${CAST[id].name} <span class="ja">${CAST[id].ja}</span></b><div style="font-size:13px;color:#6b6270;margin-top:6px">${blurb[id]}</div></div>`).join('')}</div>
+      <div style="text-align:center;margin-top:22px"><span style="background:#e0457b;color:#fff;font-weight:700;padding:12px 30px;border-radius:14px">Start with Shiba →</span></div></div>`;
+    for (const el of document.querySelectorAll('.spr')) {
+      const cv = await sprite(companion(el.dataset.id, { cute: true, expr: 'happy' }));
+      cv.style.width = '100%'; cv.style.imageRendering = 'pixelated'; el.appendChild(cv);
+    }
+  },
+  async pixelscene() {
+    const cv = await pixelScene({});
+    root.innerHTML = `<div class="board"><div class="panel" style="width:960px"></div></div>`;
+    cv.style.width = '100%'; cv.style.borderRadius = '12px'; root.querySelector('.panel').appendChild(cv);
+  },
+  async pixelidle() {
+    const t = Number(q.get('t') || 0);
+    const ids = ['shiba', 'neko', 'tanuki', 'kappa', 'nekomata'];
+    root.innerHTML = `<div class="board" style="padding:16px 22px"><div class="grid5" id="g"></div></div>`;
+    const g = document.getElementById('g');
+    for (const [k, id] of ids.entries()) {
+      const blink = ((t + k * 0.21) % 1) < 0.07;
+      const cv = await sprite(companion(id, { cute: true, blink, bob: Math.round(Math.sin((t + k * 0.1) * Math.PI * 2) * 3), tailWag: Math.round(Math.sin((t + k * 0.2) * Math.PI * 4) * 16), paw: id === 'neko' ? (Math.sin(t * Math.PI * 4) + 1) * 14 : 0 }), { k: 4 });
+      cv.style.width = '100%'; const d = document.createElement('div'); d.className = 'card'; d.appendChild(cv);
+      d.insertAdjacentHTML('beforeend', `<b>${CAST[id].name}</b>`); g.appendChild(d);
+    }
+  },
+  async pixelgarden() {
+    const t = Number(q.get('t') || 0);
+    const steps = [[0, 'spring', 'Day 1'], [1, 'spring', '3-day streak · blossoms'], [2, 'spring', '7 days · lantern'], [3, 'summer', '14 days · koi pond'], [4, 'autumn', '30 days · torii'], [5, 'winter', 'Genki II done · tea house']];
+    const i = Math.min(steps.length - 1, Math.floor(t * steps.length));
+    const cv = await pixelScene({ items: steps[i][0], season: steps[i][1], t: (t * steps.length) % 1, expr: i === 5 ? 'happy' : 'neutral', px: 160 });
+    root.innerHTML = `<div class="board" style="padding:14px"><div class="panel" style="width:480px"></div></div>`;
+    cv.style.width = '100%'; cv.style.borderRadius = '10px'; const p = root.querySelector('.panel'); p.appendChild(cv);
+    p.insertAdjacentHTML('beforeend', `<div style="display:flex;justify-content:space-between;margin:8px 6px 2px;font-family:monospace;font-weight:700"><span>${steps[i][2]}</span><span>${'★'.repeat(i + 1)}</span></div>`);
+  },
+  idle() {
+    const t = Number(q.get('t') || 0);
+    const ids = ['shiba', 'neko', 'kappa', 'nekomata'];
+    const blinkAt = (k) => ((t + k * 0.23) % 1) < 0.06;
+    root.innerHTML = `<div class="board" style="padding:18px 24px"><h1 style="font-size:22px">Idle loop <small>· breathe, blink, tail, paw</small></h1>
+      <div class="grid5" style="grid-template-columns:repeat(4,1fr)">${ids.map((id, k) => `<div class="card">${svg(200, 200, companion(id, { blink: blinkAt(k), bob: Math.sin((t + k * 0.1) * Math.PI * 2) * 2.5, tailWag: Math.sin((t + k * 0.2) * Math.PI * 4) * 14, paw: id === 'neko' ? (Math.sin(t * Math.PI * 4) + 1) * 14 : 0 }))}<b>${CAST[id].name}</b></div>`).join('')}</div></div>`;
+  },
+  peek() {
+    const t = Number(q.get('t') || 0);
+    // 0-.35 peek from card 1 corner, .35-.5 hide, .5-.85 pop above card 2, .85-1 hide
+    const phase = (a, b) => Math.max(0, Math.min(1, (t - a) / (b - a)));
+    const up1 = t < 0.35 ? Math.sin(phase(0, 0.35) * Math.PI) : 0;
+    const up2 = t >= 0.5 && t < 0.85 ? Math.sin(phase(0.5, 0.85) * Math.PI) : 0;
+    const look = Math.sin(t * Math.PI * 8) * 3;
+    const card = (y, h, title, body) => `<rect x="18" y="${y}" width="324" height="${h}" rx="18" fill="#fff" stroke="#efe2e6"/><text x="36" y="${y + 28}" font-size="13" font-weight="700" fill="#2a2438">${title}</text>${body}`;
+    const goals = ['WaniKani reviews', 'Bunpro', 'Textbook · grammar', 'Conjugation'].map((g, i) => `<circle cx="44" cy="${282 + i * 36}" r="10" fill="${i < 2 ? '#e0457b' : 'none'}" stroke="#e0457b" stroke-width="2"/><text x="64" y="${287 + i * 36}" font-size="13" fill="#2a2438">${g}</text>`).join('');
+    // Each tanuki is drawn just before the card it hides behind and clipped to the space above that card.
+    const tan1 = `<g clip-path="url(#c1)">${companion('tanuki', { x: 248 + look, y: 232 - up1 * 58, scale: 0.42, expr: up1 > 0.7 ? 'wink' : 'neutral' })}</g>`;
+    const tan2 = `<g clip-path="url(#c2)">${companion('tanuki', { x: 34 + look, y: 476 - up2 * 60, scale: 0.42, expr: up2 > 0.6 ? 'happy' : 'surprised' })}</g>`;
+    const phone = `<defs><clipPath id="c1"><rect x="0" y="0" width="360" height="236"/></clipPath><clipPath id="c2"><rect x="0" y="420" width="360" height="54"/></clipPath><clipPath id="screen"><rect x="0" y="0" width="360" height="640" rx="40"/></clipPath></defs>
+      <g clip-path="url(#screen)"><rect width="360" height="640" fill="#fbf5f2"/>
+      <text x="22" y="62" font-size="20" font-weight="700" fill="#2a2438">おはよう、Martin</text><text x="300" y="62" font-size="22" font-weight="700" fill="#e0457b">12</text>
+      ${blossomTree(214, 70, 0.75)}
+      ${tan1}
+      ${card(232, 188, "Today's goals", goals)}
+      ${tan2}
+      ${card(470, 120, 'WaniKani', '<text x="36" y="538" font-size="34" font-weight="700" fill="#e0457b">24</text><text x="36" y="560" font-size="12" fill="#8a7f8d">reviews waiting</text>')}
+      </g><rect x="1" y="1" width="358" height="638" rx="40" fill="none" stroke="#1d1a24" stroke-width="10"/>`;
+    root.innerHTML = `<div class="board" style="padding:16px 20px;display:flex;gap:28px;align-items:center">${svg(360, 640, phone, 'width="360" height="640"')}
+      <div class="notes" style="max-width:420px"><h1 style="font-size:22px">Sneaky companion</h1><p>Now and then the tanuki peeks from behind a card corner, looks around, winks and hides; then pops over another card. It never covers text or buttons — tap it and it scurries away.</p></div></div>`;
+  },
+  garden() {
+    const t = Number(q.get('t') || 0);
+    const steps = [
+      [0, 'spring', 'Day 1 · a young tree'], [1, 'spring', '3-day streak · blossoms'], [2, 'spring', '7 days · stone lantern'],
+      [3, 'summer', '14 days · koi pond (summer fireflies)'], [4, 'autumn', '30 days · torii (autumn momiji)'], [5, 'winter', 'Genki II done · tea house (winter)'],
+    ];
+    const i = Math.min(steps.length - 1, Math.floor(t * steps.length));
+    const [items, season, label] = steps[i];
+    root.innerHTML = `<div class="board" style="padding:16px 20px"><div class="panel" style="width:480px">${svg(480, 360, scene('flat', { items, season, t: (t * steps.length) % 1, expr: i === 5 ? 'happy' : 'neutral' }))}
+      <div style="display:flex;justify-content:space-between;margin:8px 6px 2px"><b>${label}</b><span style="color:#8a7f8d">${['🌱', '🌸', '🏮', '🐟', '⛩️', '🏠'].slice(0, i + 1).join(' ')}</span></div></div></div>`;
+  },
+};
+await boards[board]();
+document.body.dataset.ready = '1';
+</script></body></html>
