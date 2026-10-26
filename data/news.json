@@ -1,6 +1,26 @@
 {
- "updated": "2026-10-26T04:52:58+00:00",
+ "updated": "2026-10-26T13:10:08+00:00",
  "easy": [
+  {
+   "title": "いろいろな所で雨が降った　災害に気をつけて",
+   "url": "https://nhkeasier.com/story/10061/",
+   "date": "2026-10-26T20:05:00+09:00"
+  },
+  {
+   "title": "将棋のプロ棋士　初めて女性がなる",
+   "url": "https://nhkeasier.com/story/10062/",
+   "date": "2026-10-26T20:04:00+09:00"
+  },
+  {
+   "title": "ブラジルの大統領選挙　今の大統領のルーラさんが選ばれた",
+   "url": "https://nhkeasier.com/story/10063/",
+   "date": "2026-10-26T20:03:00+09:00"
+  },
+  {
+   "title": "岩手県でサケを食べるイベントがあった",
+   "url": "https://nhkeasier.com/story/10064/",
+   "date": "2026-10-26T20:02:00+09:00"
+  },
   {
    "title": "台風30号　沖縄県の近くに来る",
    "url": "https://nhkeasier.com/story/10057/",
@@ -105,63 +125,43 @@
    "title": "気象庁が「緊急地震速報」を取り消した　原因を調べている",
    "url": "https://nhkeasier.com/story/10037/",
    "date": "2026-10-16T20:15:00+09:00"
-  },
-  {
-   "title": "日本に住んでいる外国人は428万人 今まででいちばん多い",
-   "url": "https://nhkeasier.com/story/10038/",
-   "date": "2026-10-16T20:14:00+09:00"
-  },
-  {
-   "title": "ドイツで日本の米を紹介 ヨーロッパにたくさん輸出したい",
-   "url": "https://nhkeasier.com/story/10039/",
-   "date": "2026-10-16T20:13:00+09:00"
-  },
-  {
-   "title": "石川県 地震で被害を受けた人たちがフィンランドのスポーツを楽しむ",
-   "url": "https://nhkeasier.com/story/10040/",
-   "date": "2026-10-16T20:12:00+09:00"
-  },
-  {
-   "title": "簗農林水産大臣が大臣をやめた",
-   "url": "https://nhkeasier.com/story/10033/",
-   "date": "2026-10-15T20:05:00+09:00"
   }
  ],
  "regular": [
   {
-   "title": "台風30号は温帯低気圧に 西～東日本で非常に激しい雨のおそれ",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261026de65420",
-   "date": "2026-10-26T12:11:00+09:00"
+   "title": "家電量販店「Joshin」 顧客情報600万件漏えいの可能性",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261026de65955",
+   "date": "2026-10-26T21:18:46+09:00"
   },
   {
-   "title": "将棋 西山朋佳女流四冠 プロ入り表明 初の女性プロ棋士誕生へ",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261026de65487",
-   "date": "2026-10-26T11:58:00+09:00"
+   "title": "電子ギフト会社に不正アクセス 5億5000万円分が不正発行",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261026de66013",
+   "date": "2026-10-26T21:47:49+09:00"
   },
   {
-   "title": "ドクターイエローの後継「ドクターS」が初運行 JR東海",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261026de65533",
-   "date": "2026-10-26T11:41:00+09:00"
+   "title": "ハッカー集団 GMOにあす期限で100万ドル要求 顧客脅迫も",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261026de65733",
+   "date": "2026-10-26T19:37:12+09:00"
   },
   {
-   "title": "天皇皇后両陛下 高知市内で「バリアフリー図書」を視察",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261026de65571",
-   "date": "2026-10-26T13:01:00+09:00"
+   "title": "福田康夫元首相が死去 90歳",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261026de65501",
+   "date": "2026-10-26T18:57:52+09:00"
   },
   {
-   "title": "福岡 北九州 冠水した道路で車1台が立往生 けが人なし",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261026de65565",
-   "date": "2026-10-26T12:09:00+09:00"
+   "title": "東京国際映画祭始まる 雨天も人気俳優らが登場",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261026de65966",
+   "date": "2026-10-26T20:50:36+09:00"
   },
   {
-   "title": "政府 相次ぐ不正アクセス受け今夜関係閣僚会議開催へ",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261026de65587",
-   "date": "2026-10-26T11:59:00+09:00"
+   "title": "大分市佐賀関の火災 被災した170棟余の公費解体の作業終了",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261026de65972",
+   "date": "2026-10-26T21:54:47+09:00"
   },
   {
-   "title": "みらい“AI活用へ規制改革と「AI失業」対策を” 政府に提言",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261026de65641",
-   "date": "2026-10-26T13:18:43+09:00"
+   "title": "巨人 松井秀喜新監督に元監督の堀内恒夫さん「長期政権を」",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261026de65951",
+   "date": "2026-10-26T20:28:29+09:00"
   }
  ]
 }
