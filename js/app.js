@@ -1021,7 +1021,8 @@ document.addEventListener('click', (e) => {
       return;
     case 'reset-all':
       if (confirm('Erase all progress on this device? Export a backup first!')) {
-        localStorage.clear();
+        // Only Benkyō's keys: other apps on solthax.github.io share this localStorage.
+        Object.keys(localStorage).filter((k) => k.startsWith('benkyo')).forEach((k) => localStorage.removeItem(k));
         location.reload();
       }
       return;

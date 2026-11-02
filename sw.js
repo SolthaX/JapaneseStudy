@@ -1,7 +1,8 @@
 // Offline support: app shell is served stale-while-revalidate, news is network-first.
 // WaniKani API calls are cross-origin and never cached here.
 
-const CACHE = 'benkyo-v5';
+// The origin (solthax.github.io) is shared with other apps: only ever touch caches named benkyo-*.
+const CACHE = 'benkyo-v6';
 const SHELL = [
   './',
   'index.html',
@@ -20,13 +21,15 @@ const SHELL = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // cache: 'reload' bypasses the HTTP cache (10 min on Pages) so a new version never caches stale files.
+  const fresh = SHELL.map((u) => new Request(u, { cache: 'reload' }));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(fresh)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => k.startsWith('benkyo-') && k !== CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim()),
   );
 });
