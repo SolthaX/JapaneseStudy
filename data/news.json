@@ -1,6 +1,26 @@
 {
- "updated": "2026-11-02T11:16:31+00:00",
+ "updated": "2026-11-02T21:43:54+00:00",
  "easy": [
+  {
+   "title": "「防災庁」が新しくできた",
+   "url": "https://nhkeasier.com/story/10081/",
+   "date": "2026-11-02T20:30:00+09:00"
+  },
+  {
+   "title": "スペイン政府「高速鉄道の事故で日本人が1人亡くなった」",
+   "url": "https://nhkeasier.com/story/10082/",
+   "date": "2026-11-02T20:29:00+09:00"
+  },
+  {
+   "title": "GMOの不正アクセス　「システムに問題があった」",
+   "url": "https://nhkeasier.com/story/10083/",
+   "date": "2026-11-02T20:28:00+09:00"
+  },
+  {
+   "title": "外国人の旅行者　1度消費税を払ってから返してもらう",
+   "url": "https://nhkeasier.com/story/10084/",
+   "date": "2026-11-02T20:27:00+09:00"
+  },
   {
    "title": "富士山が雪で白くなった",
    "url": "https://nhkeasier.com/story/10077/",
@@ -105,63 +125,43 @@
    "title": "台風30号　沖縄県の近くに来る",
    "url": "https://nhkeasier.com/story/10057/",
    "date": "2026-10-23T20:10:00+09:00"
-  },
-  {
-   "title": "自殺した人が少なくなった　子どもは増えている",
-   "url": "https://nhkeasier.com/story/10058/",
-   "date": "2026-10-23T20:09:00+09:00"
-  },
-  {
-   "title": "赤澤大臣「ホワイトハッカーのチームをつくる」",
-   "url": "https://nhkeasier.com/story/10059/",
-   "date": "2026-10-23T20:08:00+09:00"
-  },
-  {
-   "title": "プロ野球の巨人　新しい監督は松井秀喜さん",
-   "url": "https://nhkeasier.com/story/10060/",
-   "date": "2026-10-23T20:07:00+09:00"
-  },
-  {
-   "title": "コンピューターのことばに弱点　多くの会社がウェブサイトを止めた",
-   "url": "https://nhkeasier.com/story/10053/",
-   "date": "2026-10-22T20:15:00+09:00"
   }
  ],
  "regular": [
   {
-   "title": "GMO 不正アクセス問題 熊谷社長ら記者会見【詳細】",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261102de69492",
-   "date": "2026-11-02T19:48:00+09:00"
+   "title": "GMO 経営トップ含めセキュリティーリスク対応の体制構築が課題",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261103de69861",
+   "date": "2026-11-03T05:02:31+09:00"
   },
   {
-   "title": "ノジマ 不正アクセスで約700万件の個人情報漏えい",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261102de69780",
-   "date": "2026-11-02T19:16:00+09:00"
+   "title": "「秋の叙勲」受章者発表 各界で功労のあった計3861人が受章",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261103de69860",
+   "date": "2026-11-03T06:39:49+09:00"
   },
   {
-   "title": "防災庁発足 「緊急要請」発表し備蓄や住宅耐震化など求める",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261102de69369",
-   "date": "2026-11-02T19:08:29+09:00"
+   "title": "アメリカ中間選挙 日本時間の今夜から投票開始 焦点は",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261103de69868",
+   "date": "2026-11-03T06:12:11+09:00"
+  },
+  {
+   "title": "米アンソロピック 売り上げ13倍もAI開発への支出は140兆円余に",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261103de69869",
+   "date": "2026-11-03T05:43:00+09:00"
+  },
+  {
+   "title": "作家の山中恒さんの手記全文が初公開 憲法公布時期に執筆",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261102de69842",
+   "date": "2026-11-03T05:30:50+09:00"
+  },
+  {
+   "title": "ソウルの飲酒運転死亡事故から1年 犠牲者の日本人女性を悼む",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261103de69858",
+   "date": "2026-11-03T05:29:33+09:00"
   },
   {
    "title": "中野ブロードウェイ 高級時計窃盗事件 男は新幹線で西に移動か",
    "url": "https://news.web.nhk/newsweb/na/nd-20261102de69776",
    "date": "2026-11-02T19:23:00+09:00"
-  },
-  {
-   "title": "GMO 熊谷社長会見で陳謝 ぜい弱性指摘 サービス運営に生かせず",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261101de69276",
-   "date": "2026-11-02T19:57:24+09:00"
-  },
-  {
-   "title": "アメリカ中間選挙 トランプ大統領が中西部で遊説締めくくる",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261102de69457",
-   "date": "2026-11-02T18:29:00+09:00"
-  },
-  {
-   "title": "ヒグマと衝突し脱線のJR宗谷線 3日も終日運転見合わせ",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261102de69766",
-   "date": "2026-11-02T19:27:02+09:00"
   }
  ]
 }
