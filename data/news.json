@@ -1,6 +1,26 @@
 {
- "updated": "2026-11-04T06:31:37+00:00",
+ "updated": "2026-11-04T17:17:50+00:00",
  "easy": [
+  {
+   "title": "トランプ大統領と同じ党の議員が半分より少なくなりそう",
+   "url": "https://nhkeasier.com/story/10085/",
+   "date": "2026-11-04T20:10:00+09:00"
+  },
+  {
+   "title": "関東地方や伊豆諸島で雨がたくさん降りそう",
+   "url": "https://nhkeasier.com/story/10086/",
+   "date": "2026-11-04T20:09:00+09:00"
+  },
+  {
+   "title": "山形県のダリア園　みんなに花をプレゼント",
+   "url": "https://nhkeasier.com/story/10087/",
+   "date": "2026-11-04T20:08:00+09:00"
+  },
+  {
+   "title": "高知県黒潮町　いすに座って海を見るイベント",
+   "url": "https://nhkeasier.com/story/10088/",
+   "date": "2026-11-04T20:07:00+09:00"
+  },
   {
    "title": "「防災庁」が新しくできた",
    "url": "https://nhkeasier.com/story/10081/",
@@ -105,63 +125,43 @@
    "title": "いろいろな所で雨が降った　災害に気をつけて",
    "url": "https://nhkeasier.com/story/10061/",
    "date": "2026-10-26T20:05:00+09:00"
-  },
-  {
-   "title": "将棋のプロ棋士　初めて女性がなる",
-   "url": "https://nhkeasier.com/story/10062/",
-   "date": "2026-10-26T20:04:00+09:00"
-  },
-  {
-   "title": "ブラジルの大統領選挙　今の大統領のルーラさんが選ばれた",
-   "url": "https://nhkeasier.com/story/10063/",
-   "date": "2026-10-26T20:03:00+09:00"
-  },
-  {
-   "title": "岩手県でサケを食べるイベントがあった",
-   "url": "https://nhkeasier.com/story/10064/",
-   "date": "2026-10-26T20:02:00+09:00"
-  },
-  {
-   "title": "台風30号　沖縄県の近くに来る",
-   "url": "https://nhkeasier.com/story/10057/",
-   "date": "2026-10-23T20:10:00+09:00"
   }
  ],
  "regular": [
   {
-   "title": "アメリカ中間選挙 民主党が上下両院で多数派奪還へ【速報中】",
+   "title": "アメリカ中間選挙 民主党 上下両院で多数派奪還へ【最新情報】",
    "url": "https://news.web.nhk/newsweb/na/nd-20261103de69965",
-   "date": "2026-11-04T15:29:56+09:00"
+   "date": "2026-11-04T20:32:13+09:00"
   },
   {
-   "title": "トランプ大統領「結果を受け入れるつもり」",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261104de70306",
-   "date": "2026-11-04T14:59:04+09:00"
+   "title": "良品計画 クレカ番号の全桁 約109万件が漏えいのおそれ",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261104de70494",
+   "date": "2026-11-04T19:14:00+09:00"
   },
   {
-   "title": "食料品などの高騰「懸念」80％以上 アメリカ有権者の意識は",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261104de70229",
-   "date": "2026-11-04T14:35:37+09:00"
+   "title": "伊豆諸島や千葉県に発達した雨雲 昼ごろにかけて大雨のおそれ",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261105de70681",
+   "date": "2026-11-05T00:51:00+09:00"
   },
   {
-   "title": "株価 一時3000円超の値下がり AI関連投資の先行きに不透明感",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261104de70160",
-   "date": "2026-11-04T13:48:32+09:00"
+   "title": "東京 神津島村に「レベル４土砂災害危険警報」",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261105de70698",
+   "date": "2026-11-05T01:48:37+09:00"
   },
   {
-   "title": "三菱UFJ 新ネット銀行ではキャッシュカード“発行しない”方針",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261104de70251",
-   "date": "2026-11-04T13:28:00+09:00"
+   "title": "千葉 南房総市に「レベル4土砂災害危険警報」",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261104de70670",
+   "date": "2026-11-05T00:01:00+09:00"
   },
   {
-   "title": "東武日光線4人死亡事故 第三者委員会が初会合",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261104de70307",
-   "date": "2026-11-04T14:36:00+09:00"
+   "title": "有罪判決の競泳 本多灯選手に1年9か月の資格停止処分",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261104de70644",
+   "date": "2026-11-04T22:33:35+09:00"
   },
   {
-   "title": "台風31号 暖湿気流入で関東や伊豆諸島 今夜遅くから大雨おそれ",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261104de70112",
-   "date": "2026-11-04T13:48:04+09:00"
+   "title": "NYダウ平均株価 一時1000ドル超の上昇 アメリカ中間選挙受け",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261104de70666",
+   "date": "2026-11-04T23:58:00+09:00"
   }
  ]
 }
