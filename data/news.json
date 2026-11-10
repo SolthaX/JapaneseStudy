@@ -1,6 +1,26 @@
 {
- "updated": "2026-11-10T03:36:33+00:00",
+ "updated": "2026-11-10T14:57:22+00:00",
  "easy": [
+  {
+   "title": "気象庁「エルニーニョ現象が今まででいちばん強い」",
+   "url": "https://nhkeasier.com/story/10101/",
+   "date": "2026-11-10T20:10:00+09:00"
+  },
+  {
+   "title": "ネパールの大臣「気候が変わって私たちの将来も変わる」",
+   "url": "https://nhkeasier.com/story/10102/",
+   "date": "2026-11-10T20:09:00+09:00"
+  },
+  {
+   "title": "パレスチナのガザ地区で大雨　子どもなど6人が亡くなる",
+   "url": "https://nhkeasier.com/story/10103/",
+   "date": "2026-11-10T20:08:00+09:00"
+  },
+  {
+   "title": "宮城県白石市　40㎏の米が入った俵を運ぶイベント",
+   "url": "https://nhkeasier.com/story/10104/",
+   "date": "2026-11-10T20:07:00+09:00"
+  },
   {
    "title": "愛知県で震度5強の地震　1週間ぐらい気をつけて",
    "url": "https://nhkeasier.com/story/10097/",
@@ -105,63 +125,43 @@
    "title": "富士山が雪で白くなった",
    "url": "https://nhkeasier.com/story/10077/",
    "date": "2026-10-30T20:05:00+09:00"
-  },
-  {
-   "title": "電気代とガス代に国がお金を出す",
-   "url": "https://nhkeasier.com/story/10078/",
-   "date": "2026-10-30T20:04:00+09:00"
-  },
-  {
-   "title": "ハロウィーン　渋谷の「ハチ公」をシートで隠す",
-   "url": "https://nhkeasier.com/story/10079/",
-   "date": "2026-10-30T20:03:00+09:00"
-  },
-  {
-   "title": "法隆寺　国の宝になっている仏像を見ることができる",
-   "url": "https://nhkeasier.com/story/10080/",
-   "date": "2026-10-30T20:02:00+09:00"
-  },
-  {
-   "title": "スペイン　高速鉄道でまた列車の事故　60人以上が亡くなった",
-   "url": "https://nhkeasier.com/story/10073/",
-   "date": "2026-10-29T20:10:00+09:00"
   }
  ],
  "regular": [
   {
-   "title": "9月家計調査 実質の消費支出6.8％減 10か月連続の減少",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73268",
-   "date": "2026-11-10T11:31:53+09:00"
+   "title": "子どものSNS利用 発達段階に応じた考え方提示 こども家庭庁",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73287",
+   "date": "2026-11-10T19:51:00+09:00"
   },
   {
-   "title": "エヌビディアCEOと中国情報機関の協力者女性の疑惑 FBIが捜査",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73265",
-   "date": "2026-11-10T10:15:28+09:00"
+   "title": "エルニーニョ現象 過去最大の強さに どんな影響が",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73297",
+   "date": "2026-11-10T19:48:00+09:00"
   },
   {
-   "title": "アメリカ ヘグセス国防長官 弾劾訴追決議案を共和党議員が提出",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73227",
-   "date": "2026-11-10T10:38:00+09:00"
+   "title": "米消費者物価指数 10月は前月比0.4％上昇 市場予想を上回る",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73820",
+   "date": "2026-11-10T22:57:26+09:00"
   },
   {
-   "title": "Xに「いいね」14回で有罪判決 ストーカー規制法違反の罪",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73342",
-   "date": "2026-11-10T11:51:00+09:00"
+   "title": "米FDA 糖尿病治療薬「マンジャロ」などに視力低下リスクを警告",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73780",
+   "date": "2026-11-10T20:31:00+09:00"
   },
   {
-   "title": "安保3文書改定へ 政府側が防衛力強化の方向性を示す",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73284",
-   "date": "2026-11-10T11:04:00+09:00"
+   "title": "スマホ遠隔操作し商品だまし取った疑い 中国籍の2人逮捕 福岡",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73782",
+   "date": "2026-11-10T20:44:00+09:00"
   },
   {
-   "title": "米中間選挙後初 日米外相が意見交換 安全保障協力推進で一致",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73223",
-   "date": "2026-11-10T11:32:00+09:00"
+   "title": "巨人 ドラフト1位指名であいさつ 織田翔希投手は同席せず",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73588",
+   "date": "2026-11-10T17:46:57+09:00"
   },
   {
-   "title": "台風32号 小笠原諸島に接近へ 暴風や高波に警戒",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73239",
-   "date": "2026-11-10T12:18:40+09:00"
+   "title": "JR東「ウォークスルー改札」山手線全駅など再来年春に導入へ",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73528",
+   "date": "2026-11-10T16:19:00+09:00"
   }
  ]
 }
