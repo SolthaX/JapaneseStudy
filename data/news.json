@@ -1,6 +1,26 @@
 {
- "updated": "2026-11-11T06:31:43+00:00",
+ "updated": "2026-11-11T17:12:10+00:00",
  "easy": [
+  {
+   "title": "秋になってからいちばん寒い朝だった",
+   "url": "https://nhkeasier.com/story/10105/",
+   "date": "2026-11-11T20:20:00+09:00"
+  },
+  {
+   "title": "熊本地震で閉めていたスーパーが店を開けた",
+   "url": "https://nhkeasier.com/story/10106/",
+   "date": "2026-11-11T20:19:00+09:00"
+  },
+  {
+   "title": "イギリスの海でタコがたくさんとれている",
+   "url": "https://nhkeasier.com/story/10107/",
+   "date": "2026-11-11T20:18:00+09:00"
+  },
+  {
+   "title": "北海道根室市の港 「サンマがたくさん釣れて驚いた」",
+   "url": "https://nhkeasier.com/story/10108/",
+   "date": "2026-11-11T20:17:00+09:00"
+  },
   {
    "title": "気象庁「エルニーニョ現象が今まででいちばん強い」",
    "url": "https://nhkeasier.com/story/10101/",
@@ -105,63 +125,43 @@
    "title": "「防災庁」が新しくできた",
    "url": "https://nhkeasier.com/story/10081/",
    "date": "2026-11-02T20:30:00+09:00"
-  },
-  {
-   "title": "スペイン政府「高速鉄道の事故で日本人が1人亡くなった」",
-   "url": "https://nhkeasier.com/story/10082/",
-   "date": "2026-11-02T20:29:00+09:00"
-  },
-  {
-   "title": "GMOの不正アクセス　「システムに問題があった」",
-   "url": "https://nhkeasier.com/story/10083/",
-   "date": "2026-11-02T20:28:00+09:00"
-  },
-  {
-   "title": "外国人の旅行者　1度消費税を払ってから返してもらう",
-   "url": "https://nhkeasier.com/story/10084/",
-   "date": "2026-11-02T20:27:00+09:00"
-  },
-  {
-   "title": "富士山が雪で白くなった",
-   "url": "https://nhkeasier.com/story/10077/",
-   "date": "2026-10-30T20:05:00+09:00"
   }
  ],
  "regular": [
   {
-   "title": "去年7月の参院選は違憲状態 1票の格差めぐる判決 最高裁",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261111de74142",
-   "date": "2026-11-11T15:17:00+09:00"
+   "title": "情報漏えいリスク回避へ対策は？通販サイト閉鎖の企業も",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261111de73911",
+   "date": "2026-11-11T18:51:00+09:00"
   },
   {
-   "title": "東京 青梅 圏央道で5台関係する玉突き事故 1人重体",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261111de74133",
-   "date": "2026-11-11T15:18:43+09:00"
+   "title": "日本近海で水温上昇 雑種フグ・アニサキス…食の安全に影響も",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261111de73954",
+   "date": "2026-11-11T20:25:41+09:00"
   },
   {
-   "title": "NTTドコモ通信障害続く 不正アクセス確認されず",
+   "title": "アメリカ・ロシア・ウクライナ高官協議 大規模捕虜交換で合意",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261110de73734",
+   "date": "2026-11-11T21:58:23+09:00"
+  },
+  {
+   "title": "ドコモ通信障害復旧 原因は機器の不具合",
    "url": "https://news.web.nhk/newsweb/na/nd-20261111de73934",
-   "date": "2026-11-11T14:56:00+09:00"
+   "date": "2026-11-11T21:47:21+09:00"
   },
   {
-   "title": "JR貨物社員を逮捕 賄賂数百万円受け取った疑い 福岡県警",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261111de74092",
-   "date": "2026-11-11T14:03:00+09:00"
+   "title": "自民 森山前幹事長 石破氏ら4人“国民の気持ち反映した行動”",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261111de74306",
+   "date": "2026-11-11T17:47:39+09:00"
   },
   {
-   "title": "“トランプ大統領とネタニヤフ首相が電話会談どなり合い”報道",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261111de74128",
-   "date": "2026-11-11T15:20:22+09:00"
+   "title": "福島 いわき 男児死亡 母親が夏ごろ“県外に避難する”と説明",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261111de74482",
+   "date": "2026-11-11T23:26:07+09:00"
   },
   {
-   "title": "消費税減税法案が参院に 高市首相“支援金 勤労者の3割以上”",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261111de73947",
-   "date": "2026-11-11T14:43:06+09:00"
-  },
-  {
-   "title": "今季いちばんの冷え込み 日中は気温上昇 台風で小笠原は大しけ",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261111de73870",
-   "date": "2026-11-11T13:58:43+09:00"
+   "title": "海水温上昇 イギリスでタコ大量発生 ロブスター ホタテ大幅減",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261111de74426",
+   "date": "2026-11-11T21:38:00+09:00"
   }
  ]
 }
