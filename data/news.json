@@ -1,6 +1,26 @@
 {
- "updated": "2026-11-18T11:49:39+00:00",
+ "updated": "2026-11-18T20:36:53+00:00",
  "easy": [
+  {
+   "title": "風が強くなって波も高くなりそう　雪にも気をつけて",
+   "url": "https://nhkeasier.com/story/10125/",
+   "date": "2026-11-18T20:10:00+09:00"
+  },
+  {
+   "title": "日本　ミャンマーの避難民がタイで仕事ができるように手伝う",
+   "url": "https://nhkeasier.com/story/10126/",
+   "date": "2026-11-18T20:09:00+09:00"
+  },
+  {
+   "title": "インターネットを使うことができない携帯電話ができた",
+   "url": "https://nhkeasier.com/story/10127/",
+   "date": "2026-11-18T20:08:00+09:00"
+  },
+  {
+   "title": "山口県宇部市の小学校　6年生が湖でカヌーに乗った",
+   "url": "https://nhkeasier.com/story/10128/",
+   "date": "2026-11-18T20:07:00+09:00"
+  },
   {
    "title": "群馬県前橋市　熊に襲われて1人がけがをした",
    "url": "https://nhkeasier.com/story/10121/",
@@ -105,63 +125,43 @@
    "title": "気象庁「エルニーニョ現象が今まででいちばん強い」",
    "url": "https://nhkeasier.com/story/10101/",
    "date": "2026-11-10T20:10:00+09:00"
-  },
-  {
-   "title": "ネパールの大臣「気候が変わって私たちの将来も変わる」",
-   "url": "https://nhkeasier.com/story/10102/",
-   "date": "2026-11-10T20:09:00+09:00"
-  },
-  {
-   "title": "パレスチナのガザ地区で大雨　子どもなど6人が亡くなる",
-   "url": "https://nhkeasier.com/story/10103/",
-   "date": "2026-11-10T20:08:00+09:00"
-  },
-  {
-   "title": "宮城県白石市　40㎏の米が入った俵を運ぶイベント",
-   "url": "https://nhkeasier.com/story/10104/",
-   "date": "2026-11-10T20:07:00+09:00"
-  },
-  {
-   "title": "愛知県で震度5強の地震　1週間ぐらい気をつけて",
-   "url": "https://nhkeasier.com/story/10097/",
-   "date": "2026-11-09T20:10:00+09:00"
   }
  ],
  "regular": [
   {
-   "title": "APEC 高市首相と習近平国家主席が握手 プーチン氏と接触調整",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261118de77690",
-   "date": "2026-11-18T20:44:19+09:00"
+   "title": "高市首相 プーチン大統領と意見交換 習主席とは握手",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261119de78112",
+   "date": "2026-11-19T04:50:00+09:00"
   },
   {
-   "title": "APEC首脳会議開幕へ 習主席 トランプ大統領をみずから出迎え",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261118de77556",
-   "date": "2026-11-18T19:53:27+09:00"
+   "title": "注目の米中首脳会談 米中ロの3か国首脳会談 きょう開催へ",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261119de78117",
+   "date": "2026-11-19T04:46:00+09:00"
   },
   {
-   "title": "歌手の太田裕美さん死去 71歳「木綿のハンカチーフ」大ヒット",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261118de77513",
-   "date": "2026-11-18T19:15:12+09:00"
+   "title": "米中ロ首脳会談 ウクライナ外相「当事国抜きの決定は不可能」",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261119de78096",
+   "date": "2026-11-19T04:47:00+09:00"
   },
   {
-   "title": "愛子さま シンガポール大統領を表敬訪問",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261118de77677",
-   "date": "2026-11-18T20:28:59+09:00"
+   "title": "【地震情報】熊本県で震度5弱 今後1週間程度は注意を",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261119de78097",
+   "date": "2026-11-19T05:06:53+09:00"
   },
   {
-   "title": "三菱UFJグループ漏えい相次ぐ 銀行は顧客情報約650万件流出",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261118de77737",
-   "date": "2026-11-18T18:26:03+09:00"
+   "title": "ペルーのケイコ・フジモリ大統領が来日し高市首相と会談へ",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261119de78085",
+   "date": "2026-11-19T05:23:17+09:00"
   },
   {
-   "title": "日本の自動車業界 主要素材・部品共通化 競争力強化へ【QA】",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261118de77529",
-   "date": "2026-11-18T19:54:49+09:00"
+   "title": "与党 消費税法案の会期内成立を 野党 関文科相への追及強める",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261119de78076",
+   "date": "2026-11-19T05:08:00+09:00"
   },
   {
-   "title": "2つの低気圧急発達へ 北海道暴風警戒 日本海側は雪道に備えて",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261118de77980",
-   "date": "2026-11-18T20:06:00+09:00"
+   "title": "死亡の3歳女児に数十か所のあざ 生活実態など捜査 兵庫 伊丹",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261119de78092",
+   "date": "2026-11-19T05:29:42+09:00"
   }
  ]
 }
