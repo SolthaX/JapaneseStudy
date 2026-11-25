@@ -1,6 +1,26 @@
 {
- "updated": "2026-11-25T08:42:25+00:00",
+ "updated": "2026-11-25T19:20:33+00:00",
  "easy": [
+  {
+   "title": "秋田県や埼玉県で火事　3人が亡くなった",
+   "url": "https://nhkeasier.com/story/10141/",
+   "date": "2026-11-25T20:05:00+09:00"
+  },
+  {
+   "title": "京王電鉄　「客など1100万人以上の情報が盗まれた」",
+   "url": "https://nhkeasier.com/story/10142/",
+   "date": "2026-11-25T20:04:00+09:00"
+  },
+  {
+   "title": "中国の宇宙船「神舟」に初めて外国人が乗った",
+   "url": "https://nhkeasier.com/story/10143/",
+   "date": "2026-11-25T20:03:00+09:00"
+  },
+  {
+   "title": "長い間使った筆や鉛筆に「ありがとう」",
+   "url": "https://nhkeasier.com/story/10144/",
+   "date": "2026-11-25T20:02:00+09:00"
+  },
   {
    "title": "強い風や急な強い雨に気をつけて　25日は寒くなりそう",
    "url": "https://nhkeasier.com/story/10137/",
@@ -105,63 +125,43 @@
    "title": "火事で焼けた沖縄の首里城　正殿の工事が終わった",
    "url": "https://nhkeasier.com/story/10117/",
    "date": "2026-11-16T20:10:00+09:00"
-  },
-  {
-   "title": "石川県　地震で壊れた学校  使うことができるようになった",
-   "url": "https://nhkeasier.com/story/10118/",
-   "date": "2026-11-16T20:09:00+09:00"
-  },
-  {
-   "title": "アメリカ　戻ってきた宇宙船を打ち上げた場所でキャッチした",
-   "url": "https://nhkeasier.com/story/10119/",
-   "date": "2026-11-16T20:08:00+09:00"
-  },
-  {
-   "title": "”いつも面白いものがあった”ハンズ渋谷店が閉店した",
-   "url": "https://nhkeasier.com/story/10120/",
-   "date": "2026-11-16T20:07:00+09:00"
-  },
-  {
-   "title": "マイクロソフトでトラブル　世界中でメールなどが使えない",
-   "url": "https://nhkeasier.com/story/10113/",
-   "date": "2026-11-13T20:10:00+09:00"
   }
  ],
  "regular": [
   {
-   "title": "死亡したのは駐輪場で働く70歳男性 刺した人物は逃走 福岡",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261125de81118",
-   "date": "2026-11-25T17:28:54+09:00"
+   "title": "米 過剰生産で日本などに追加関税 既存税率含め日本最大15％に",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261126de81560",
+   "date": "2026-11-26T01:21:46+09:00"
   },
   {
-   "title": "関文科相の問責決議案 あす提出の方針 立民 斎藤国対委員長",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261125de80993",
-   "date": "2026-11-25T17:00:21+09:00"
+   "title": "PayPayでシステム障害 カード連携サービスで決済できず",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261125de81532",
+   "date": "2026-11-25T23:16:00+09:00"
   },
   {
-   "title": "公取事務総長 職員の政治資金パーティー出席 法令上問題ない",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261125de81285",
-   "date": "2026-11-25T17:23:18+09:00"
+   "title": "福岡 駅員殴った疑いで49歳逮捕 男性刺殺事件と関連調べ",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261125de81511",
+   "date": "2026-11-25T22:06:00+09:00"
   },
   {
-   "title": "2029年大河ドラマは「三成のうた」 主演は神木隆之介さん",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261125de81004",
-   "date": "2026-11-25T15:38:00+09:00"
+   "title": "卓球 五輪3大会連続でメダル 石川佳純さんが結婚 SNSで発表",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261125de81444",
+   "date": "2026-11-25T20:30:00+09:00"
   },
   {
-   "title": "パルシステムの顧客情報 約200万件が漏えい",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261125de81299",
-   "date": "2026-11-25T17:14:55+09:00"
+   "title": "「いのちのスープ」料理研究家の辰巳芳子さん死去 101歳",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261126de81547",
+   "date": "2026-11-26T00:35:13+09:00"
   },
   {
-   "title": "M＆A仲介会社に不正アクセス 最大数千社分の顧客情報漏えいか",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261125de81289",
-   "date": "2026-11-25T17:30:17+09:00"
+   "title": "米 牧場で働く3人が鳥インフルエンザウイルス感染 1人死亡 WHO",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261125de81523",
+   "date": "2026-11-25T23:08:00+09:00"
   },
   {
-   "title": "徳島 詐欺容疑で逮捕の阿波市長 辞任の意向示す",
-   "url": "https://news.web.nhk/newsweb/na/nd-20261125de81248",
-   "date": "2026-11-25T17:19:44+09:00"
+   "title": "インドネシアの金鉱山で浸水 3人死亡 23人坑内に閉じ込めか",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261125de81535",
+   "date": "2026-11-26T00:08:00+09:00"
   }
  ]
 }
